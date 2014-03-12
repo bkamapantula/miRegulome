@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	        <meta content="utf-8" http-equiv="encoding">
+	        <!--link rel="stylesheet" type="text/css" href="css/bootstrap.css"/-->
+                <link rel="stylesheet" type="text/css" media="screen and (min-width: 1367px) and (max-width: 1920px)" href="design-min.css">
+                <link rel="stylesheet" type="text/css" media="screen and (min-width: 701px) and (max-width: 1366px)" href="laptopDesign-min.css">
+                <link href="css/smoothness/jquery-ui-1.10.1.custom-min.css" rel="stylesheet" type="text/css"/>
+                <link href="tabs-min.css" rel="stylesheet" type="text/css"/>
+		<link rel="stylesheet" type="text/css" media="screen and (min-width: 1367px) and (max-width: 1920px)" href="mirnavis-min.css"/>
+		<link rel="stylesheet" type="text/css" media="screen and (min-width: 701px) and (max-width:1366px)" href="mirnavis-laptop-min.css"/>
+		<script type="text/javascript" src="js/vis-min.js"></script>
+		<title> miRegulome | Advanced search </title>
+		<!--[if lt IE 9]>
+		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+		<![endif]-->
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+                google.load("jquery", "1.6.1");
+                google.load('visualization', '1.1', {packages: ['table']});
+        </script>
+	<script type="text/javascript">
+		var options = {allowHtml: true, alternatingRowStyle: true};
+		var optionsMirna = {allowHtml: true, alternatingRowStyle: true};
+        	var optionsOne = {allowHtml: true, alternatingRowStyle: true}; 
+	        var optionsTwo = {allowHtml: true, alternatingRowStyle: true}; 
+        	var optionsThree = {allowHtml: true, alternatingRowStyle: true};
+	        var optionsFour = {allowHtml: true, alternatingRowStyle: true}; 
+        	var optionsFive = {allowHtml: true, alternatingRowStyle: true};
+	        var optionsSix = {allowHtml: true, alternatingRowStyle: true};
+        	var selectedMirna = '';
+	        var currentTab = -1;
+
+                var chemicalSearched="-1"; // chemical
+		var mirnaSearched="-1"; // mirna
+		var rcSearched="-1"; // response to chemical
+		var conditionSearched="-1"; // condition
+		var techniqueSearched="-1"; // technique
+		var tfregSearched="-1"; // tf regulator
+		var gtSearched="-1"; // gene target
+		var functionSearched="-1";
+		var diseaseSearched="-1";
+		var pathwaySearched="-1";
+		var speciesSearched="-1";
+		var dregSearched="-1";
+		var capitalChemicalNameMain = '';
+		var flag = 1;
+	        var visualization;
+        	var dataTable = new google.visualization.DataTable();
+
+	        function capitalizeFirstLetter(string) {
+        	        return string.charAt(0).toUpperCase() + string.slice(1);
+	        }
+
+        // draws the table      
+        function draw() {
+                visualization.draw(dataTable, options);
+        }
+
+        // sets number of pages
+        function setNumberOfPagesDown(value) {
+                if(value) {
+                        options['pageSize'] = parseInt(value, 10);
+                        options['page'] = 'enable';
+                } else {
+                        options['pageSize'] = null;
+                        options['page'] = null;
+                }
+                draw();
+        }
+
+		function drawVisualization(data) {
+	                dataTable = new google.visualization.DataTable();
+        	        var numRows = data.length;
+                	dataTable.addColumn('string', 'Chemical Name (CTD)');
+			dataTable.addColumn('string', 'miRNA (miRBase)'); 
+			dataTable.addColumn('string', 'Regulation'); 
+			dataTable.addColumn('string', 'Condition');
+			dataTable.addColumn('string', 'Technique'); 
+			dataTable.addColumn('string', 'PMID (NCBI)'); 
+			dataTable.addColumn('string', 'miRNA Details');
+			dataTable.addRows(numRows);
+	                for (var j = 0; j < numRows; j++) {
+        	                capitalChemicalNameMain = data[j]['chem_name']; //capitalizeFirstLetter(data[j]['chem_name']);
+                	        dataTable.setCell(j, 0, '<a href="'+data[j]['ctd_link']+'" class="embeddedAnchors" target="_blank">' + capitalChemicalNameMain + '</a>');
+                        	mirnaurl = 'http://www.mirbase.org/cgi-bin/query.pl?terms='+ data[j]['mirna_name'] +'&submit=Search';
+	                        dataTable.setCell(j, 1, '<a href="'+mirnaurl+'" class="embeddedAnchors" target="_blank">' + data[j]['mirna_name'] + '</a>');
+        	                var capitalRegulation = data[j]['response']; //capitalizeFirstLetter(data[j]['response']);
+                	        var capitalCondition = data[j]['cond']; //capitalizeFirstLetter(data[j]['cond']);
+                        	var capitalTechnique = data[j]['tech']; //capitalizeFirstLetter(data[j]['tech']);
+	                        dataTable.setCell(j, 2, capitalRegulation); dataTable.setCell(j, 3, capitalCondition); dataTable.setCell(j, 4, capitalTechnique);
+        	                if(data[j]['chem_pubId'] != null) {
+                	                pubmedurl = 'http://www.ncbi.nlm.nih.gov/pubmed?term=' + data[j]['chem_pubId'];
+                        	        dataTable.setCell(j, 5, '<a href="'+pubmedurl+'" class="embeddedAnchors" target="_blank">' +data[j]['chem_pubId'] + '</a>');
+	                        }
+        	                else {
+                	                dataTable.setCell(j, 5, "N/A");
+                        	}
+	                        dataTable.setCell(j, 6, data[j]['mirna_name']);
+        	        }
+
+        	        options['page'] = 'enable'; options['pageSize'] = 10; options['pagingSymbols'] = {prev: 'prev', next: 'next'}; options['pagingButtonsConfiguration'] = 'auto';
+	                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                	options['cssClassNames'] = cssNames;
+			var total = Math.ceil(numRows/10);
+			document.getElementById('pageCnt').innerHTML = numRows; //total;
+
+        	        visualization = new google.visualization.Table(document.getElementById('table'));
+			draw();
+	                google.visualization.events.addListener(visualization, 'select', selectHandler);
+			var counter = 1;
+
+                function selectHandler() {
+                        var selection = visualization.getSelection();
+                        var message = '';
+                        for (var i = 0; i < selection.length; i++) {
+                                var item = selection[i];
+                                if (item.row != null && item.column != null) {
+                                        var str = dataTable.getFormattedValue(item.row, item.column);
+                                        message += '{row:' + item.row[1] + '}' + +str+'\n' ; //+ ',column:' + item.column + '} = ' + str + '\n';
+                                } else if (item.row != null) {
+                                        var str = dataTable.getFormattedValue(item.row, 6);
+                                        selectedMirna = str;
+                                        message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
+					jQuery_132_172_latest(".mirna-heading, .table-heading").show();
+					jQuery_132_172_latest("#anchor-arrows-meaning").show();
+					//jQuery_132_172_latest(".scrolltotop").css("visibility", "visible").animate({opacity: 0.8}, 1500);
+                                        //jQuery_132_172_latest("body, html").animate({scrollTop: jQuery_132_172_latest(".mirna-heading").position().top  }, 1500);
+					drawCircle();
+					drawTextInCanvas(selectedMirna);
+                                        if(counter === 0) {
+                                                jQuery_132_172_latest("displaySelectedMirnaName").empty();
+                                                jQuery_132_172_latest("#displaySelectedMirnaName").append('<a href="#">'+'Selected: '+selectedMirna+'</a>');
+						jQuery_132_172_latest(".mirna-heading").html(selectedMirna + ' Regulome');
+                                                counter = 1;
+                                        }
+                                        if(counter === 1) {
+                                                jQuery_132_172_latest("#displaySelectedMirnaName").empty();
+                                                jQuery_132_172_latest("#displaySelectedMirnaName").append('<a style="background-color:#061413; color: #ffffff;">'+capitalChemicalNameMain+' -> '+selectedMirna+'</a>');
+                                                counter = 0;
+                                                jQuery_132_172_latest(".mirna-heading").html(selectedMirna + ' Regulome');
+                                        }
+                                        jQuery_132_172_latest.ajax({
+                                                type: "POST",
+                                                url: "loadSuggestions.php",
+                                                data: {'mirnaSelectedForDisplay': str, 'idata': 90},
+                                                success: function(upStream) {
+                                                        var upstreamResults = JSON.parse(upStream);
+                                                        jQuery_132_172_latest(".ui-tabs").show();
+							jQuery_132_172_latest("#mirnavis").show();
+                                                        drawUpstream(upstreamResults);
+							drawUpstreammirnavis(upstreamResults);
+							jQuery_132_172_latest("#numberingTabs1").show();
+							jQuery_132_172_latest(".prompt-message-down").hide();
+                                                }
+                                        });
+					jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 95},
+                                                 success: function(validatedTargetsResultsAreBack) {
+                                                 	var onlyVt = JSON.parse(validatedTargetsResultsAreBack);
+                                                 	drawValidatedTargetsmirnavis(onlyVt);
+                                                  }
+                                         });
+					// fetches chemicals for visualization
+                                        jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 96},
+                                                 success: function(validatedTargetsResultsAreBack) {
+                                                        var onlyVt = JSON.parse(validatedTargetsResultsAreBack);
+                                                        drawChemicalsmirnavis(onlyVt);
+                                                  }
+                                         });
+					// loads top targets of miRNA
+					jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 100},
+                                                 success: function(topTargetsResultsAreBack) {
+                                                 	var onlyVt = JSON.parse(topTargetsResultsAreBack);
+                                                 	drawTopTargetsmirnavis(onlyVt);
+                                                  }
+                                         });
+
+					// loads functions of miRNA
+					jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 105},
+                                                 success: function(topTargetsResultsAreBack) {
+                                                 	var onlyVt = JSON.parse(topTargetsResultsAreBack);
+                                                 	drawFunctionsmirnavis(onlyVt);
+                                                  }
+                                         });
+
+					jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 110},
+                                                 success: function(diseaseResultsAreBack) {
+                                                 	var onlyVt = JSON.parse(diseaseResultsAreBack);
+                                                 	drawDiseasesmirnavis(onlyVt);
+                                                  }
+                                         });
+
+					jQuery_132_172_latest.ajax({
+                                                 type: "POST",
+                                                 url: "loadSuggestions.php",
+                                                 data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 115},
+                                                 success: function(pathwayResultsAreBack) {
+                                                 	var onlyVt = JSON.parse(pathwayResultsAreBack);
+                                                 	drawPathwaysmirnavis(onlyVt);
+                                                  }
+                                         });
+
+                                        if(currentTab !== -1) {
+                                                if(currentTab === 1) { // Current selected tab is Validated Targets
+							serverReqValidatedTargets();
+                                                }
+                                                if(currentTab === 2) { // Current selected tab is Top Targets
+							serverReqTopTargets();
+                                                }
+                                                if(currentTab === 3) { // Current selected tab is Function of miRNA
+							serverReqFunctions();
+                                                }
+                                                if(currentTab === 4) { // Current selected tab is Disease Involvement
+							serverReqDiseases();
+                                                }
+                                                if(currentTab === 5) { // Current selected tab is Pathway
+							serverReqPathways();
+                                                }
+                                        }
+                                } else if (item.column != null) {
+                                        var str = dataTable.getFormattedValue(0, item.column);
+                                        message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
+                                        }
+                        } // for loop end
+                        if (message == '') {
+                                message = 'nothing';
+                        }
+                } // end of select event handler
+	}
+
+	</script>
+
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+	<script type="text/javascript">
+	var jQuery191 = $.noConflict(true);
+	jQuery191(function () {
+		//jQuery191("#toggleSearchDiv").show();
+		jQuery191("#anchor-arrows-meaning").click(function() {
+			$(".arrows-meaning").css({
+				position: "absolute",
+			        top: ($("#anchor-arrows-meaning").position().top+10) + "px",
+			        left: $("#anchor-arrows-meaning").position().left + "px",
+				width: $("#anchor-arrows-meaning").width()
+			}).toggle();
+		});
+
+		var allChemicals = [];
+		var mirnas = [];
+		var responses = [];
+		var diseases = [];
+		var conditions = [];
+		var techniques = [];
+		var upstreamRegs = [];
+		var geneTargets = [];
+		var pathways = [];
+		var mirnaFunctions = [];
+		var speciesss = [];
+		var diseaseRegs = [];
+		var optionSelected = 0;
+		var lookupNumber = 0;
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search1": 0},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							allChemicals[j] = responseData[j][1];
+					}
+					jQuery191("#search_box1").autocomplete({ 
+						source: allChemicals,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search2": 1},
+				dataType: "json",
+				success: function(responseDataTwo) {
+					for(var jj=0; jj<responseDataTwo.length;jj++) {
+							mirnas[jj] = responseDataTwo[jj]['mirna_name'];
+					}
+					jQuery191("#search_box2").autocomplete({ 
+						source: mirnas,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search3": 2},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							responses[j] = responseData[j]['response'];
+					}
+					jQuery191("#search_box3").autocomplete({ 
+						source: responses,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search4": 3},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							conditions[j] = responseData[j]['cond'];
+					}
+					jQuery191("#search_box4").autocomplete({ 
+						source: conditions,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search5": 4},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							if(responseData[j]['tech'] !== "") {
+								techniques[j] = responseData[j]['tech'];
+							}
+					}
+					jQuery191("#search_box5").autocomplete({ 
+						source: techniques,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search6": 5},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							upstreamRegs[j] = responseData[j]['up_tf'];
+					}
+					jQuery191("#search_box6").autocomplete({ 
+						source: upstreamRegs,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+      
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search7": 6},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							geneTargets[j] = responseData[j]['gene_name'];
+					}
+					jQuery191("#search_box7").autocomplete({ 
+						source: geneTargets,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search8": 7},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							mirnaFunctions[j] = responseData[j]['mir_fun'];
+					}
+					jQuery191("#search_box8").autocomplete({ 
+						source: mirnaFunctions,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search9": 8},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							diseases[j] = responseData[j]['dis_name'];
+					}
+					jQuery191("#search_box9").autocomplete({ 
+						source: diseases,
+						messages: {	noResults: null, 
+							results: function() { } 
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search10": 9},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							pathways[j] = responseData[j]['pathway'];
+					}
+					jQuery191("#search_box10").autocomplete({ 
+						source: pathways,
+						messages: {	noResults: null,
+							results: function() { }
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search11": 10},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							speciesss[j] = responseData[j]['species'];
+					}
+					jQuery191("#search_box11").autocomplete({ 
+						source: speciesss,
+						messages: {	noResults: null,
+							results: function() { }
+						}
+					});
+				}
+			});
+
+			jQuery191.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {"search12": 11},
+				dataType: "json",
+				success: function(responseData) {
+					for(var j=0; j<responseData.length;j++) {
+							diseaseRegs[j] = responseData[j]['dis_reguln'];
+					}
+					jQuery191("#search_box12").autocomplete({ 
+						source: diseaseRegs,
+						messages: {	noResults: null,
+							results: function() { }
+						}
+					});
+				}
+			});
+
+		jQuery_132_172_latest("#testDiv").dialog({
+			height: 200,
+			width: 250,
+			modal: true,
+			autoOpen: false,
+			open: function(event, ui) {
+				setTimeout("jQuery_132_172_latest('#testDiv').dialog('close')", 4000);
+			},
+			close: function() { 
+				jQuery_132_172_latest("#testDiv").attr('readonly','readonly'); 
+			}
+		});
+
+		jQuery_132_172_latest("#errorDiv").dialog({
+			height: 200,
+			width: 250,
+			modal: true,
+			autoOpen: false,
+			open: function(event, ui) {
+				setTimeout("jQuery_132_172_latest('#errorDiv').dialog('close')", 4000);
+			},
+			close: function() { 
+				jQuery_132_172_latest("#errorDiv").attr('readonly','readonly'); 
+			}
+		});
+
+		jQuery191("#toggleSearchDiv").click(function(){
+			jQuery191("#searchDiv").toggle();
+		});
+
+        });
+	</script>
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://jquery.com/latest/ui/jquery.ui.tabs.js"></script>
+	<script type="text/javascript">
+		var jQuery_132_172_latest = $.noConflict(true);
+
+	        jQuery_132_172_latest(function() {
+
+			jQuery_132_172_latest("#searchForm").submit(function(event) {
+			event.preventDefault();
+		        chemicalSearched = jQuery_132_172_latest("#search_box1").val(); // chemical
+			mirnaSearched = jQuery_132_172_latest("#search_box2").val(); // mirna
+			rcSearched = jQuery_132_172_latest("#search_box3").val(); // response to chemical
+			conditionSearched = jQuery_132_172_latest("#search_box4").val(); // condition
+			techniqueSearched = jQuery_132_172_latest("#search_box5").val(); // technique
+			tfregSearched = jQuery_132_172_latest("#search_box6").val(); // tf regulator
+			gtSearched = jQuery_132_172_latest("#search_box7").val(); // gene target
+			functionSearched = jQuery_132_172_latest("#search_box8").val();
+			diseaseSearched = jQuery_132_172_latest("#search_box9").val();
+			pathwaySearched = jQuery_132_172_latest("#search_box10").val();
+			speciesSearched = jQuery_132_172_latest("#search_box11").val();
+			dregSearched = jQuery_132_172_latest("#search_box12").val();
+
+		        if(chemicalSearched || mirnaSearched || rcSearched || conditionSearched || techniqueSearched || tfregSearched || gtSearched || functionSearched || diseaseSearched || pathwaySearched || speciesSearched || dregSearched ) {
+		            jQuery_132_172_latest.ajax({
+		                type: "POST",
+		                url: "do_search.php",
+		                data: {"searchedChemical": chemicalSearched, "searchedMirna": mirnaSearched, "searchedRc": rcSearched, "searchedCondition": conditionSearched, "searchedTechnique": techniqueSearched, "searchedTfreg": tfregSearched, "searchedGt": gtSearched, "searchedFunction": functionSearched, "searchedDisease": diseaseSearched, "searchedPathway": pathwaySearched, "searchedSpecies": speciesSearched, "searchedDreg": dregSearched },
+				dataType: "json",
+		                beforeSend: function(html) { // this happens before actual call
+		                    jQuery_132_172_latest("#results").html(''); 
+		                    jQuery_132_172_latest("#searchresults").show();
+		                    //$(".word").html(ChemicalSearched);
+		               },
+		               success: function(data) {// this happens after we get results
+					if(data.length<1) {
+						jQuery_132_172_latest("#testDiv").dialog('open');
+					}
+					else {
+						jQuery_132_172_latest("#recordsFound").show();
+						drawVisualization(data);
+						jQuery_132_172_latest("#numberingDiv").show();
+	                                        jQuery_132_172_latest(".prompt-message-down").fadeIn(3000); //effect("pulsate", {times: 2}, 2000);
+
+						if(flag == 0) {
+							jQuery_132_172_latest("#searchDiv").hide();
+						}
+						else {
+							jQuery_132_172_latest("#searchDiv").hide();
+							jQuery_132_172_latest("#toggleSearchDiv").toggle();
+							flag = 0;
+						}
+					}
+		               }
+		            });    
+		        }
+			//return false;
+			else {
+				jQuery_132_172_latest("#errorDiv").dialog('open');
+			        return false;
+			}
+		    });
+
+		jQuery_132_172_latest(".ui-tabs").tabs({
+		        select: function(event, ui) {
+		                currentTab = ui.index;
+		                if(ui.index === 0) { // Upstream
+		                        jQuery_132_172_latest.ajax({
+		                                type: "POST",
+		                                url: "loadSuggestions.php",
+		                                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 90},
+		                                success: function(upstreamResultsAreBack) {
+		                                        var onlyUpstream = JSON.parse(upstreamResultsAreBack);
+		                                        drawUpstream(onlyUpstream);
+							jQuery_132_172_latest("#numberingTabs1").show();
+		                                }
+		                        });
+		                }
+		                if(ui.index === 1) { // Validated Targets
+					serverReqValidatedTargets();
+		                }
+		                if(ui.index === 2) { // Top Targets
+					serverReqTopTargets();
+				}
+		                if(ui.index === 3) { // Functions
+					serverReqFunctions();
+		                }
+		                if(ui.index === 4) { // Diseases
+					serverReqDiseases();
+		                }
+		                if(ui.index === 5) { // Pathways
+					serverReqPathways();
+		                }
+			} // end of select
+			}); // end of tabs
+
+		$(".prompt-message-down").click(function(){
+			$(this).hide();
+		});
+
+		// scroll to top
+		/*jQuery_132_172_latest(".scrolltotop").click(function() {
+			$("body, html").animate({scrollTop: jQuery_132_172_latest("#recordsFound").position().top}, 1500);
+		});*/
+
+	}); // end of $.function
+
+	</script>
+
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="header" class="headerDiv"> 
+                                <div id="titleImage"> <h3><a href="index.php" class="titleClass">miRegulome</a> <br/>
+<a href="javascript:void(0)" style="text-decoration: none; font-size: 0.9em; color: rgba(255, 255, 255, 0.5); font-family: Arial, Helvetica, sans-serif ; ">a knowledge base of miRNA regulomics</a></h3>
+                                </div>
+			</div>
+						<ul class="ktb">
+                                                        <li><a href="index.php" class="navAnchor">Home</a></li>
+                                                        <li><a href="dbLookup.php" class="navAnchor">Search by Chemical</a></li>
+                                                        <li><a href="advsearch.html" class="branding navAnchor">Advanced Search</a></li>
+                                                        <li><a href="analysis.html" class="navAnchor">Analysis</a></li>
+                                                        <li><a href="javascript:void(0);" class="navAnchor navAnchor-more">More<i class="icon-chevron-down"> </i></a>
+                                                                <ul class="flowingNav">
+                                                                        <li><a href="faqs.html" class="navAnchor">FAQs</a></li>
+                                                                        <!--li><a href="copyrights.html" class="navAnchor">Copyrights</a></li-->
+                                                                        <li><a href="contact.html" class="navAnchor">Team</a></li>
+									 <li><a href="disclaimer.html" class="navAnchor">Disclaimer</a></li>
+                                                                        <li><a href="userguide.html" class="navAnchor">User Guide</a></li>
+									<li><a href="resources.html" class="navAnchor">Resources</a></li>
+                                                                </ul>
+                                                        </li>
+						</ul>
+			<!--/div> <-end of header-->
+			<div id="headerBar"> </div>
+			<div id="mainContent">
+				<div id="rightContent">
+					<div id="content">
+						<div id="contentHeading">Advanced Search</div>
+						<div class="message">
+							<div id="messageHeading">Tips</div>
+							<div id="messageMessage">
+								<ol>
+									<li>At least one field must be filled</li>
+									<li>Combinations of multiple fields can be searched</li>
+									<li>Please use the suggested value for any searched term</li>
+								</ol>
+							</div>
+						</div>
+						<div id="toggleSearchDiv">Search again</div>
+						<div id="searchDiv">
+						<form action="" class="input-holder" id="searchForm">
+							<table>
+							<tr><td><input type="text" placeholder="Chemical name" id="search_box1" class="boxInput"></td>
+								<td><input type="text" placeholder="miRNA" id="search_box2" class="boxInput"></td>
+							<td><input type="text" placeholder="Response to chemical" id="search_box3" class="boxInput"></td>
+								<td><input type="text" placeholder="Condition" id="search_box4" class="boxInput"></td> </tr>
+							<tr><td><input type="text" placeholder="Technique" id="search_box5" class="boxInput"></td>
+								<td><input type="text" placeholder="TF Regulator" id="search_box6" class="boxInput"></td>
+							<td><input type="text" placeholder="Gene Target" id="search_box7" class="boxInput"></td>
+								<td><input type="text" placeholder="Function of miRNA" id="search_box8" class="boxInput"></td>
+							</tr>
+							<tr><td><input type="text" placeholder="Disease" id="search_box9" class="boxInput"></td>
+								<td><input type="text" placeholder="Pathway" id="search_box10" class="boxInput">
+							<td><input type="text" placeholder="Species" id="search_box11" class="boxInput"></td>
+								<td><input type="text" placeholder="Disease Regulator" id="search_box12" class="boxInput"></tr>
+							<tr>
+<td style="padding:0 45px 0 45px;"> <input type="submit" value="Search" class="search_button"> </td><td><input type="reset" value="Clear"> </td>
+							</tr>
+							</table>
+					        </form><br/>
+						</div><br/>
+					<div id="testDiv" title="No records found!"> <p>Please try a different search</p> </div> <br/>
+					<div id="errorDiv" title="Input error!"> <p>Please enter at least one field</p> </div>
+					<div id="searchedDBFor"> </div>
+					<div id="recordsFound" style="display: none; font-weight: bold;">Records found</div><br/>
+					<div class="prompt-message-down" title="Click to close"/>Click on miRNA for details. Displays data below this table.</div>
+					<div id="table"></div>
+					<div id="numberingDiv" style="display: none;">
+						Total rows: <!--span id="pageNumbering"></span> out of <--> <span id="pageCnt"></span>
+                                                <select style="font-size: 12px" id="numberOfPagesSelect" onchange='setNumberOfPagesDown(this.value)'>
+                                                 <option value="">No paging</option>
+                                                 <option selected="selected" value="10">10</option>
+						 <option value="25">25</option>
+                                                 <option value="50">50</option>
+                                                 <option value="100">100</option>
+                                                </select>
+					</div> <br/>
+<h4 class="mirna-heading"></h4>
+<a href="javascript:void();" id="anchor-arrows-meaning"><img src="images/bulbc.png" height="16px" width="16px"/></a>
+<div class="arrows-meaning">
+	<img src="images/miregulome-arrows-c.png" width="185px" height="90px"/>
+</div>
+<div id="mirnavis" style="display:none;">
+	<div id="mirnavisupstream"></div>
+	<div id="mirnavisupstream-repression"></div>
+	<div id="mirnachemicals"></div>
+	<div id="mirnavisvalidated"></div>
+	<h3 class="label-left upstream-heading">Upstream activators</h3>
+	<h3 class="label-left upstream-repression-heading">Upstream repressors</h3>
+	<h3 class="label-left chemicals-heading">Chemicals</h3>
+	<h3 class="label-left functions-heading">Functions</h3>
+	<h3 class="label-left diseases-heading">Diseases</h3>
+	<h3 class="label-right toptargets-heading">Top targets</h3>
+	<h3 class="label-right validatedtargets-heading">Validated targets</h3>
+	<h3 class="label-right pathways-heading">Pathways</h3>
+	
+	<div id="mirnavistop"></div>
+	<div id="canvascontainer">
+		<canvas id="mirnavisname" width="175" height="120"></canvas>
+	</div>
+							<div id="arrowdisease">
+							<hr id="validatedtargetshr"/>
+							<hr id="validatedtargetshrvertical"/>
+							<hr id="chemicalshr"/>
+							<hr id="chemicalshrinhibition"/>
+							<hr id="chemicalshrinhibitionvertical"/>
+							<hr id="pathwayshr"/>
+							<hr id="pathwayshrvertical"/>
+							<hr id="functionshr"/>
+							<hr id="functionshrinhibition"/>
+							<hr id="functionshrinhibitionvertical"/>
+							<hr id="upstreamhr"/>
+							<article class="upstreamhrvertical"></article>
+							<hr id="upstreamrepressorshr">
+							<hr id="upstreamrepressorshrhorizontal"/>
+							<hr id="functiondiseasehr"/>
+							<hr id="pathwayfunctionhr"/>
+							<hr id="validatedtoptargetshr"/>
+							<article class="upArrow"></article>
+							<hr id="diseasehr"/>
+							<hr id="toptargetspathwayshr"/>
+							<article class="downArrowchemical"></article>
+							<article class="downArrowfunction"></article>
+							<article class="upArrowvalidatedtop"></article>
+						</div>
+						<div id="mirnavisfunction"></div>
+						<div id="mirnavisdiseases"></div>
+						<div id="mirnavispathways"></div>
+					</div>
+					<h4 class="table-heading">Tabular format: miRNA related information</h4>
+                                        <div class="ui-tabs" style="display: none;">
+                                                <ul class="ui-tabs-nav">
+                                                        <li><a href="#tabs-1">Upstream Regulators</a></li>
+                                                        <li><a href="#tabs-2">Validated Targets</a></li>
+                                                        <li><a href="#tabs-3">Top Targets</a></li>
+                                                        <li><a href="#tabs-4">Function of miRNA</a></li>
+                                                        <li><a href="#tabs-5">Disease Involvement</a></li>
+                                                        <li><a href="#tabs-6">Pathways</a></li>
+                                                        <li id="displaySelectedMirnaName"></li>
+                                                </ul>
+						<div id="tabs-1" class="ui-tabs-panel"> 
+							<div id="drawTabs1"> </div>
+							<div id="numberingTabs1" style="display: none;"> 
+								<!--Displaying <span id="pageNumberingTabs1"></span> out of <span id="pageCntUpstream"></span-->
+							Total rows: <span id="pageCntUpstream"></span>
+                                                        <select style="font-size: 12px" id="upstreamSelect" onchange='setNumberOfPagesDownUpstream(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+							</div>
+						</div>
+							<div id="tabs-2" class="ui-tabs-panel">
+								<div id="drawTabs2"></div>
+								<div id="numberingTabs2" style="display: none;"> 
+								<!--Displaying <span id="pageNumberingTabs2"></span> out of <span id="pageCntValidTargets"></span-->
+							Total rows: <span id="pageCntValidTargets"></span>
+                                                        <select style="font-size: 12px" id="validatedSelect" onchange='setNumberOfPagesDownValidated(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+								</div>
+							</div>
+							<div id="tabs-3" class="ui-tabs-panel">
+								<div id="drawTabs3"> </div>
+								<div id="numberingTabs3" style="display: none;">
+<!--Displaying <span id="pageNumberingTabs3"></span> out of <span id="pageCntTopTargets"></span-->
+                                                        Total rows: <span id="pageCntTopTargets"></span>
+                                                        <select style="font-size: 12px" id="topSelect" onchange='setNumberOfPagesDownTop(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+								</div>
+							</div>
+                        	                        <div id="tabs-4" class="ui-tabs-panel">
+								<div id="drawTabs4"></div>
+								<div id="numberingTabs4" style="display: none;">
+<!--Displaying <span id="pageNumberingTabs4"></span> out of <span id="pageCntFunction"></span-->
+                                                        Total rows: <span id="pageCntFunctions"></span>
+                                                        <select style="font-size: 12px" id="functionsSelect" onchange='setNumberOfPagesDownFunctions(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+							</div>
+							</div>
+							<div id="tabs-5" class="ui-tabs-panel">
+								<div id="drawTabs5"></div>
+								<div id="numberingTabs5" style="display:none;">
+                                                       <!--Displaying <span id="pageNumberingTabs5"></span> out of <span id="pageCntDisease"></span-->
+							Total rows: <span id="pageCntDiseases"></span>
+                                                        <select style="font-size: 12px" id="diseasesSelect" onchange='setNumberOfPagesDownDiseases(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+							</div>
+							</div>
+                                        	        <div id="tabs-6" class="ui-tabs-panel">
+								<div id="drawTabs6"></div>
+								<div id="numberingTabs6" style="display: none;">
+                                                                <!--Displaying <span id="pageNumberingTabs6"></span> out of <span id="pageCntPathway"></span-->
+                                                        Total rows: <span id="pageCntPathways"></span>
+                                                        <select style="font-size: 12px" id="pathwaysSelect" onchange='setNumberOfPagesDownPathways(this.value)'>
+                                                          <option value="">No paging</option>
+                                                          <option selected="selected" value="10">10</option>
+                                                          <option value="25">25</option>
+                                                          <option value="50">50</option>
+                                                          <option value="100">100</option>
+                                                        </select>
+								</div>
+							</div>
+                                        </div> <!--end of ui-tabs-->
+					</div> <!--end of content-->
+					<!--button class="scrolltotop">Top ^</button-->
+				</div> <!--end of rightContent-->
+			</div> <!--end of mainContent-->
+		</div> <!--end of wrapper-->
+		<p class="copyrights-footer">
+             Copyrights: All rights are reserved by <a href="http://iioab.ac.in/" target="_blank" class="embeddedAnchors">Institute of Integrative Omics and Applied Biotechnology (IIOAB)</a> and <a href="http://bnet.egr.vcu.edu/" target="_blank" class="embeddedAnchors" >Biological Networks Lab, VCU</a>
+        </p>
+
+	</body>
+</html>

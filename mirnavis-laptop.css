@@ -1,0 +1,517 @@
+h4.mirna-heading {
+  border: 2px solid gray;
+  padding: 5px;
+  background: ivory; /*rgba(182, 174, 109, 0.5);*/
+  margin: 3px 0 5px 0;
+  text-align: center;
+  font-size: 15px;
+  display:none;
+}
+h4.table-heading {
+  margin-top: 2%;
+  border: 2px solid gray;
+  padding: 5px;
+  background: ivory; /*rgba(182, 174, 109, 0.5);*/
+  /*margin: 3px 0 5px 0;*/
+  text-align: center;
+  font-size: 15px;
+  display:none;
+}
+#errorDiv {
+  background: mintcream;
+}
+#mirnavis {
+  position: relative;
+  padding: 50px;
+  border: 1px;
+  border-color: red;
+  height: auto;
+  min-height: 400px;
+  background: floralwhite;
+  margin-top: 4%;
+}
+#canvascontainer {
+  position: relative;
+  top: 32%;
+  left: 39%;
+  width: 25%;
+  margin-top: 7%;
+}
+#mirnavisname {
+  position: absolute;
+}
+#arrowcanvasdisease {
+  position: relative;
+  top: 30%; left: 15%;
+}
+#drawing {
+  position: absolute;
+  left: 25%;
+}
+/*horizontal row upstream*/
+hr#upstreamhr {
+  position: absolute;
+  transform: rotate(-75deg);
+  -ms-transform: rotate(-75deg); /* IE 9 */
+  -webkit-transform: rotate(-75deg); /* Safari and Chrome */
+  -o-transform: rotate(-75deg); /* Opera */
+  -moz-transform: rotate(-75deg); /* Firefox */
+  left: 33%;
+  top: 6%;
+  height: 150px;
+  width: 5px;
+}
+.upstreamhrvertical {
+  position: absolute;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 10px solid #c00;
+  transform: rotate(20deg);
+  -webkit-transform: rotate(20deg);
+  -o-transform: rotate(20deg);
+  -moz-transform: rotate(20deg);
+  -ms-transform: rotate(20deg);
+  left: 39.25%;
+  top: 24%;
+}
+hr#upstreamrepressorvalidatedhr {
+  position: absolute;
+  transform: rotate(-55deg);
+  -ms-transform: rotate(-55deg); /* IE 9 */
+  -webkit-transform: rotate(-55deg); /* Safari and Chrome */
+  -o-transform: rotate(-55deg); /* Opera */
+  -moz-transform: rotate(-55deg); /* Firefox */
+  left: 73%;
+  top: 8.5%;
+  width:5px;
+  height:100px;
+}
+hr#upstreamrepressorshrhorizontal {
+  position: absolute;
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari and Chrome */
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  opacity: 0.5;
+  left: 46%;
+  top: 16%;
+  width:5px; height:40px;
+}
+.downArrowrepressorvalidated {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 25.56%;
+  left: 75.8%;
+  transform: rotate(-55deg);
+  -ms-transform: rotate(-55deg); /* IE 9 */
+  -webkit-transform: rotate(-55deg); /* Safari and Chrome */
+  -o-transform: rotate(-55deg); /* Opera */
+  -moz-transform: rotate(-55deg); /* Firefox */
+}
+hr#upstreamrepressorshr {
+  position: absolute;
+  transform: rotate(0deg);
+  -ms-transform: rotate(0deg); /* IE 9 */
+  -webkit-transform: rotate(0deg); /* Safari and Chrome */
+  -o-transform: rotate(0deg); /* Opera */
+  -moz-transform: rotate(0deg); /* Firefox */
+  left: 46%;
+  top: 11.25%;
+  width: 5px;
+  height: 45px;
+}
+.downArrowrepressor {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 24%;
+  left: 52%;
+  transform: rotate(55deg);
+  -ms-transform: rotate(55deg); /* IE 9 */
+  -webkit-transform: rotate(55deg); /* Safari and Chrome */
+  -o-transform: rotate(55deg); /* Opera */
+  -moz-transform: rotate(55deg); /* Firefox */
+}
+hr#chemicalshr {
+  position: absolute;
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari and Chrome */
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  left: 30%;
+  top: 19%;
+  width: 5px;
+  height: 150px;
+}
+hr#chemicalshrinhibition {
+  position: absolute;
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari and Chrome */
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  opacity: 0.5;
+  left: 30%;
+  top: 27%;
+  width: 5px;
+  height: 150px;
+}
+hr#chemicalshrinhibitionvertical{
+  position: absolute;
+  transform: rotate(1deg);
+  -webkit-transform: rotate(1deg);
+  -o-transform: rotate(1deg); /* Opera */
+  -moz-transform: rotate(1deg); /* Firefox */
+  -ms-transform: rotate(1deg); /* IE */
+  opacity: 0.5;
+  left: 36.5%;
+  top: 38.5%;
+  width: 5px;
+  height: 35px;
+}
+.downArrowchemical {
+  position: absolute;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 10px solid #c00;
+  top: 32.5%; /*48%;*/
+  left: 36.5%;
+}
+hr#diseasehr {
+  position: absolute;
+  transform: rotate(55deg);
+  -ms-transform: rotate(55deg); /* IE 9 */
+  -webkit-transform: rotate(55deg); /* Safari and Chrome */
+  -o-transform: rotate(55deg); /* Opera */
+  -moz-transform: rotate(55deg); /* Firefox */
+  left: 31%;
+  top: 38%;
+  width:5px;
+  height:225px; 
+}
+hr#validatedtargetshr {
+  position: absolute;
+  transform: rotate(70deg);
+  -ms-transform: rotate(70deg); /* IE 9 */
+  -webkit-transform: rotate(70deg); /* Safari and Chrome */
+  -o-transform: rotate(70deg); /* Opera */
+  -moz-transform: rotate(70deg); /* Firefox */
+  left: 64%;
+  top: 3%;
+  width: 5px;
+  height: 200px;
+}
+hr#validatedtargetshrvertical {
+  position: absolute;
+  transform: rotate(1deg);
+  -webkit-transform: rotate(1deg);
+  -o-transform: rotate(1deg); /* Opera */
+  -moz-transform: rotate(1deg); /* Firefox */
+  -ms-transform: rotate(1deg); /* IE */
+  left: 72.5%;
+  top: 12.5%;
+  width:5px; height:35px;
+}
+hr#pathwayshr {
+  position: absolute;
+  transform: rotate(-60deg);
+  -ms-transform: rotate(-60deg); /* IE 9 */
+  -webkit-transform: rotate(-60deg); /* Safari and Chrome */
+  -o-transform: rotate(-60deg); /* Opera */
+  -moz-transform: rotate(-60deg); /* Firefox */
+  left: 63%;
+  top: 36%;
+  width:5px;
+  height:225px;
+}
+hr#pathwayshrvertical {
+  position: absolute;
+  transform: rotate(28deg);
+  -webkit-transform: rotate(28deg);
+  -ms-transform: rotate(28deg);
+  -moz-transform: rotate(28deg);
+  -o-transform: rotate(28deg);
+  left: 71.25%;
+  top: 66.5%;
+  width:5px;
+  height:35px;
+}
+hr#functionshr {
+  position: absolute;
+  transform: rotate(0deg);
+  -webkit-transform: rotate(0deg); /*chrome, safari*/
+  -o-transform: rotate(0deg); /* Opera */
+  -moz-transform: rotate(0deg); /* Firefox */
+  -ms-transform: rotate(0deg); /* IE */
+  left: 45%;
+  top: 50%; /*32%;*/
+  width: 5px;
+  height: 60px;
+}
+hr#functionshrinhibition {
+  position: absolute;
+  transform: rotate(0deg);
+  -webkit-transform: rotate(0deg); /*chrome, safari*/
+  -o-transform: rotate(0deg); /* Opera */
+  -moz-transform: rotate(0deg); /* Firefox */
+  -ms-transform: rotate(0deg); /* IE */
+  left: 48%;
+  top: 50%; /*32%;*/
+  opacity: 0.5;
+  width: 5px;
+  height: 60px;
+}
+hr#functionshrinhibitionvertical {
+  position: absolute;
+  transform: rotate(90deg);
+  -webkit-transform: rotate(90deg); /*chrome, safari*/
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  -ms-transform: rotate(90deg); /* IE */
+  left: 48%;
+  top: 58%; /*32%;*/
+  opacity: 0.5;
+  width: 5px;
+  height: 35px;
+}
+hr#pathwayfunctionhr {
+  position: absolute;
+  transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  -ms-transform: rotate(90deg); /* IE */
+  left: 68.5%;
+  top: 70%;
+  width: 5px;
+  height: 150px;
+}
+hr#pathwayfunctionhrvertical {
+  position: absolute;
+  left: 62.25%;
+  top: 81.5%;
+  width:5px; height:35px;
+}
+.downArrowdisease {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 69.5%;
+  left: 23.25%;
+  transform: rotate(55deg);
+  -ms-transform: rotate(55deg); /* IE 9 */
+  -webkit-transform: rotate(55deg); /* Safari and Chrome */
+  -o-transform: rotate(55deg); /* Opera */
+  -moz-transform: rotate(55deg); /* Firefox */
+}
+.downArrowfunction {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 63.5%; /*48%;*/
+  left: 43.95%;
+}
+#mirnavisupstream {
+  position: absolute;
+  width: 20%;
+  top: 6%; right: 0; left: 0;
+  background: rgba(182, 174, 109, 0.5); color: black;
+  padding: 5px;
+  overflow: auto; max-height: 15%;
+}
+#mirnavisupstream-repression {
+  position: absolute;
+  width: 20%;
+  top: 6%; left: 40%;
+  background: rgba(182, 174, 109, 0.5); color: black;
+  padding: 5px;
+  overflow: auto; max-height: 15%;
+}
+#mirnachemicals {
+  position: absolute;
+  width: 20%;
+  top: 35%; left: 0;
+  background: rgba(182, 174, 109, 0.5); color: black;
+  overflow: auto; max-height: 25%;
+}
+/*#mirnavisvalidated*/
+#mirnavistop {
+  position: absolute;
+  width: 20%;
+  top: 46%; /*35%;*/
+  right: 0;
+  background: rgba(182, 174, 109, 0.5); color: black;
+  padding: 5px;
+  overflow: auto; max-height: 25%;
+}
+ /*#mirnavistop*/
+#mirnavisvalidated {
+  top: 6%;
+  position: absolute;
+  width: 20%;
+  right: 0;
+  background: rgba(182, 174, 109, 0.5);
+  padding: 5px;
+  overflow: auto; max-height: 25%;
+}
+#mirnavisfunction {
+  position: absolute;
+  width: 20%;
+  /*bottom: 0;*/
+  left: 35%;
+  top: 74%;
+  background: rgba(182, 174, 109, 0.5);
+  padding: 5px;
+  overflow: auto; max-height: 24%;
+}
+#mirnavisdiseases {
+  position: absolute;
+  width: 20%;
+  /*bottom: 0;*/
+  left: 0;
+  top:74%;
+  background: rgba(182, 174, 109, 0.5); color: black;
+  padding: 5px;
+  overflow: auto; max-height: 24%;
+}
+hr#functiondiseasehr {
+  position: absolute;
+  transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+  left: 28%;
+  top: 75%;
+  width:5px;
+  height:100px;
+}
+.downArrowfunctiondisease {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 85.5%;
+  left: 22.5%;
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari and Chrome */
+  -o-transform: rotate(90deg); /* Opera */
+  -moz-transform: rotate(90deg); /* Firefox */
+}
+hr#validatedtoptargetshr {
+  position: absolute;
+  top: 33%; /*26%;*/
+  right: 15.1%;
+  width: 5px;
+  height: 33px;
+}
+hr#toptargetspathwayshr {
+  position: absolute;
+  top: 63%;
+  right: 14%;
+  opacity: 0.5;
+  width: 5px; height: 40px;
+}
+.upArrowvalidatedtop {
+  position: absolute;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 10px solid #c00;
+  top: 40%; /*26%;*/
+  right: 14.1%;
+}
+#mirnavispathways {
+  position: absolute;
+  width: 20%;
+  /*bottom: 0;*/
+  right: 0;
+  top: 74%;
+  background: rgba(182, 174, 109, 0.75); color: black;
+  padding: 5px;
+  overflow: auto; max-height: 24%;
+}
+.label-right {
+  position: absolute;
+  padding: 5px;
+  text-align: right;
+  right: 0;
+  background: rgba(95, 158, 160, 0.5); /*cornsilk;*/
+}
+.label-left {
+  position: absolute;
+  padding: 5px;
+  text-align: left;
+  left: 0;
+  background: rgba(95, 158, 160, 0.5); /*cornsilk;*/
+}
+.upstream-heading {
+  top: -3.5%; left: 4%;
+}
+.upstream-repression-heading {
+  top: -3.5%;
+  left: 42%;
+}
+.chemicals-heading {
+  top: 26%; left: 4%;
+  width: 7%;
+}
+.functions-heading {
+  bottom: 23%;
+  left: 42%;
+}
+.diseases-heading {
+  bottom: 23%; left: 6%;
+}
+/*.toptargets-heading*/
+.validatedtargets-heading {
+  top: -3.5%; right: 5%;
+}
+/*.validatedtargets-heading*/
+.toptargets-heading {
+  top: 36%; right: 4%;
+}
+.pathways-heading {
+  top: 64%; right: 6%;
+}
+.ui-tabs {
+  margin-top: 2%;
+}
+/*arrows explanation*/
+.arrows-meaning {
+  margin-top:1%;
+  width: 10%;
+  background: white;
+  display: none;
+  z-index: 100;
+}
+img {
+  border: 2px solid black;
+}
+a#anchor-arrows-meaning {
+  position: absolute;
+  /*left: 9%;*/
+  display: none;
+  padding: 3px;
+  background: snow; /*rgba(182, 174, 109, 0.5);*/
+  color: #007099;
+  font-style: bold;
+  font-size: 1.2em;
+}
+
+hr {
+  /*opacity: 0.2;*/
+  background: #F36C3D; /*#c00; */
+}
+
+tr.hoveringTableRow {
+  cursor: pointer;
+}
+

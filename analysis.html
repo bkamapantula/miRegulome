@@ -1,0 +1,835 @@
+<html>
+  <head>
+	<title>Disease Analysis | miRegulome</title>
+        <link rel="stylesheet" type="text/css" media="screen and (max-width: 1920px)" href="design-min.css">
+        <link rel="stylesheet" type="text/css" media="screen and (min-width: 701px) and (max-width: 1366px)" href="laptopDesign-min.css">
+	<!--link rel="stylesheet" type="text/css" href="css/bootstrap.css"/-->
+        <link href="tabs-min.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="js/vis-min.js"></script>
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+                google.load("jquery", "1.6.1");
+                google.load('visualization', '1', {packages: ['table']});
+        </script>
+         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://jquery.com/latest/ui/jquery.ui.tabs.js"></script>
+        <script type="text/javascript">
+        // http://www.codeforest.net/simple-search-with-php-jquery-and-mysql
+        var options = {allowHtml: true, alternatingRowStyle: true}; 
+        var optionsFun = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsOne = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsTwo = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsThree = {allowHtml: true, alternatingRowStyle: true};
+	var optionsFour = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsFive = {allowHtml: true, alternatingRowStyle: true};
+	var optionsSix = {allowHtml: true, alternatingRowStyle: true};
+	var optionsmd = {alternatingRowStyle: true, allowHtml: true};
+	var optionsmdf = {alternatingRowStyle: true, allowHtml: true};
+        var optionsgd = {alternatingRowStyle: true, allowHtml: true};
+        var optionsgdf = {alternatingRowStyle: true, allowHtml: true};
+	var optionsPair = {alternatingRowStyle: true, allowHtml: true};
+
+	var selectedMirna = '';
+	var currentTab = -1; var diseaseName = '';
+
+        function capitalizeFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        function capitalizeFirstLetterAllWords(string) {
+                return string.replace(/\w\S+/g, function(txt){return txt.charAt(0).toUpperCase()+txt.substr(1).toLowerCase();});
+        }
+
+        function drawVisualization(data) {
+                var dataTable = new google.visualization.DataTable();
+                var numRows = data.length;
+		dataTable.addColumn('number', 'Rank');
+                dataTable.addColumn('string', 'Top affected diseases');
+		dataTable.addColumn('string', 'Count of associations'); //'No. of occurences in literature');
+                dataTable.addRows(numRows);
+                for (var j = 0; j < numRows; j++) {
+			diseaseName = capitalizeFirstLetter(data[j]['dis_name']);
+			dataTable.setCell(j, 0, j+1);
+			dataTable.setCell(j, 1, diseaseName);
+			dataTable.setCell(j, 2, data[j]['diseaseCount']);
+                }
+
+                options['page'] = 'enable'; options['pageSize'] = 10; options['width'] = '300px';
+		options['pagingSymbols'] = {prev: 'prev', next: 'next'};
+		var total = Math.ceil(numRows/10);
+		document.getElementById('pageCnt').innerHTML = numRows; //total;
+
+		options['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                options['cssClassNames'] = cssNames;
+
+                visualization = new google.visualization.Table(document.getElementById('table')); visualization.draw(dataTable, options);
+		var rem = numRows % 10;
+		if(numRows >= 10) {
+			document.getElementById('pageNumbering').innerHTML = 10;
+		}
+		else {
+			document.getElementById('pageNumbering').innerHTML = rem;
+		}
+		google.visualization.events.addListener(visualization, 'page', function (e) {
+			var counnt = numRows - ( e.page*10 ) ;
+			if( counnt >= 10 ) {
+				document.getElementById('pageNumbering').innerHTML = (e.page * 10) + 10; //e.page + 1;
+			}
+			else {
+				document.getElementById('pageNumbering').innerHTML = (e.page * 10) + rem;
+			}
+		});
+	}
+
+	function drawVisualizationFunctions(data) {
+		var dt = new google.visualization.DataTable();
+		var rows = data.length;
+		dt.addColumn('number', 'Rank');
+		dt.addColumn('string', 'Biological process');
+		dt.addColumn('string', 'Count of associations');
+		dt.addRows(rows);
+		for (var i=0;i<rows;i++) {
+			var caps = capitalizeFirstLetter(data[i]['mir_fun']);
+			dt.setCell(i, 0, i+1);
+			dt.setCell(i, 1, caps);
+			dt.setCell(i, 2, data[i]['func_count']);
+			//alert(data[i]['diseaseCount']);
+		}
+
+		optionsFun['page'] = 'enable';
+		optionsFun['pageSize'] = 10;
+		optionsFun['pagingSymbols'] = {prev: 'prev', next: 'next'};
+		optionsFun['pagingButtonsConfiguration'] = 'auto';
+		var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                optionsFun['cssClassNames'] = cssNames;
+
+		document.getElementById('pageCntFuns').innerHTML = rows; 
+                var vis = new google.visualization.Table(document.getElementById('tableFunctions'));
+                vis.draw(dt, optionsFun);
+                var rem = rows % 10;
+                if(rows >= 10) {
+                        document.getElementById('pageNumberingFuns').innerHTML = 10;
+                }
+                else {
+                        document.getElementById('pageNumberingFuns').innerHTML = rem;
+                }
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+                        if( counnt >= 10 ) {
+                                document.getElementById('pageNumberingFuns').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                        }
+                        else {
+                                document.getElementById('pageNumberingFuns').innerHTML = (e.page * 10) + rem;
+                        }
+                });
+	}
+
+	function drawMirnaDiseaseFuns(data) {
+		var dt = new google.visualization.DataTable();
+		var rows = data.length;
+		dt.addColumn('number', 'Rank');
+		dt.addColumn('string', 'Biological process');
+		dt.addColumn('string', 'Count of associations');
+		dt.addRows(rows);
+		for (var i=0;i<rows;i++) {
+			var caps = capitalizeFirstLetter(data[i]['mir_fun']);
+			dt.setCell(i, 0, i+1);
+			dt.setCell(i, 1, caps);
+			dt.setCell(i, 2, data[i]['functionCount']);
+		}
+
+                optionsmdf['page'] = 'enable';
+                optionsmdf['pageSize'] = 10;
+                optionsmdf['pagingSymbols'] = {prev: 'prev', next: 'next'};
+                optionsmdf['pagingButtonsConfiguration'] = 'auto';
+		var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+		optionsmdf['cssClassNames'] = cssNames;
+
+		if(document.getElementById('pageCntmiRNAFuns') != null) {
+	                document.getElementById('pageCntmiRNAFuns').innerHTML = rows;
+		}
+                var vis = new google.visualization.Table(document.getElementById('mirnaDiseasesFunctions'));
+                vis.draw(dt, optionsmdf);
+                var rem = rows % 10;
+
+		if(document.getElementById('pageCntmiRNAFuns') != null) {
+	                if(rows >= 10) {
+        	                document.getElementById('pageNumberingmiRNAFuns').innerHTML = 10;
+                	}
+	                else {
+        	                document.getElementById('pageNumberingmiRNAFuns').innerHTML = rem;
+                	}
+		}
+
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+                        if( counnt >= 10 ) {
+                                document.getElementById('pageNumberingmiRNAFuns').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                        }
+                        else {
+                                document.getElementById('pageNumberingmiRNAFuns').innerHTML = (e.page * 10) + rem;
+                        }
+                });
+	}
+
+	function drawMirnaDisease(data, mirnasSearched) {
+		var dt = new google.visualization.DataTable();
+		var rows = data.length;
+		dt.addColumn('number', 'Rank');
+		dt.addColumn('string', 'Top affected diseases');
+		dt.addColumn('string', 'Count of associations'); //Number of occurrences in literature');
+		dt.addRows(rows);
+		for (var i=0;i<rows;i++) {
+			var caps = capitalizeFirstLetter(data[i]['dis_name']);
+			dt.setCell(i, 0, i+1);
+			dt.setCell(i, 1, caps);
+			dt.setCell(i, 2, '<a href="javascript:void(0);" class="embeddedAnchors">'+data[i]['diseaseCount']+'</a>');
+			//dt.setCell(i, 2, data[i]['dis_pubId']);
+		}
+
+		optionsmd['page'] = 'enable';
+		optionsmd['pageSize'] = 10;
+		optionsmd['pagingSymbols'] = {prev: 'prev', next: 'next'};
+		optionsmd['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                optionsmd['cssClassNames'] = cssNames;
+
+		if(document.getElementById('pageCntmiRNA') != null) {
+	                document.getElementById('pageCntmiRNA').innerHTML = rows;
+		}
+		var vis = new google.visualization.Table(document.getElementById('mirnaDiseases'));
+		vis.draw(dt, optionsmd);
+                var rem = rows % 10;
+
+		if(document.getElementById('pageCntmiRNA') != null) {
+	                if(rows >= 10) {
+        	                document.getElementById('pageNumberingmiRNA').innerHTML = 10;
+                	}
+	                else {
+        	                document.getElementById('pageNumberingmiRNA').innerHTML = rem;
+                	}
+		}
+
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+                        if( counnt >= 10 ) {
+                                document.getElementById('pageNumberingmiRNA').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                        }
+                        else {
+                                document.getElementById('pageNumberingmiRNA').innerHTML = (e.page * 10) + rem;
+                        }
+                });
+
+                google.visualization.events.addListener(vis, 'select', selectHandler);
+		function selectHandler() {
+                        var selection = vis.getSelection();
+                        var message = '',
+			   diseaseSelected = '';
+                        for (var i = 0; i < selection.length; i++) {
+                                var item = selection[i];
+                                if (item.row != null && item.column != null) {
+                                        message += item.row + ' @@@' + '\n';
+					console.log("endo bhai!");
+                                } else if (item.row != null) {
+                                        message += '{row:' + item.row + '}' +'\n';
+					diseaseSelected = dt.getValue(item.row, 1);
+					$("#selectedDisease").html("Disease: "+diseaseSelected); // + "<a href='javascript:void(0);' class='hidepubmeds'>Hide</a>");
+                                        /*if(parseInt( item.row, 2) === 0 ) {*/
+                                                $.ajax({
+                                                        type: "POST",
+                                                        url: "diseaseAnalysis.php",
+                                                        data: {'fromDiseaseAnalysis': 5555, 'mirnas': mirnasSearched, 'disease': diseaseSelected, 'sub': 101010},
+                                                        //dataType: "json",
+                                                        success: function(data) {
+								//alert("wut!");
+								var dataj = JSON.parse(data);
+	                                                        drawPubmeds(dataj);
+        	                                                $("#pubmedsdiv, .hidepubmeds").css("visibility", "visible");
+								$("#pubmedsdiv").css({'top': mouseY, 'left': mouseX+50}).fadeIn('slow');
+                                                        },
+							error: function(request, reqstatus, errorthrown) {
+								console.log( reqstatus + " " + errorthrown  );
+							}
+                                                });
+                                        /*}*/ 
+                                } else if (item.column != null) {
+                                        message += item.row + ' $$$' + '\n';
+					console.log("endannattu?");
+                                        }
+                        } // for loop end
+                        if (message == '') {
+                                message = 'nothing';
+                        }
+                } // end of select event handler */
+
+	}
+
+	var mouseX, mouseY;
+	$(document).mousemove(function(event){
+		mouseX = event.pageX;
+		mouseY = event.pageY;
+	});
+
+	// pulls up the dialog
+	function drawPubmeds(data) {
+		var dt = new google.visualization.DataTable();
+		var rows = data.length;
+		var pubmedurl = '',
+		    allurls = 'http://www.ncbi.nlm.nih.gov/pubmed?term=';
+		dt.addColumn('number', '#');
+		dt.addColumn('string', 'Unique PMID (NCBI)');
+		dt.addColumn('string', 'miRNA');
+		dt.addColumn('string', 'Disease regulation');
+		dt.addRows(rows);
+		for(var i=0;i<rows;i++) {
+			pubmedurl = "http://www.ncbi.nlm.nih.gov/pubmed?term="+ data[i]['dis_pubId'];
+			dt.setCell(i, 0, i+1);
+			dt.setCell(i, 1,'<a href="'+pubmedurl+'" class="embeddedAnchors" target="_blank">'+data[i]['dis_pubId']+'</a>');
+			dt.setCell(i, 2, data[i]['mirna_name']);
+			dt.setCell(i, 3, data[i]['dis_reguln']);
+			allurls += data[i]['dis_pubId'] + "%2C+";
+		}
+
+		//dt.addRow( [10, '<a href="'+allurls+'" class="embeddedAnchors" target="_blank">'+ 'Search all in Pubmed</a>'] );
+		$("#searchurls").html( '<a href="'+allurls+'" class="embeddedAnchors" target="_blank">'+ 'Search all in Pubmed</a>' );
+		options['page'] = 'enable';
+		options['pageSize'] = 15;
+		options['[pagingSymbols'] = {prev: 'prev', next: 'next'};
+		options['pagingButtonsConfiguration'] = 'auto';
+		options['height'] = "200px";
+		options['width'] = "400px";
+		var vispubmeds = new google.visualization.Table(document.getElementById('dialogPubmed'));
+		vispubmeds.draw(dt, options);
+	}
+
+        function drawGeneDiseaseFuns(data) {
+                var dt = new google.visualization.DataTable();
+                var rows = data.length;
+		dt.addColumn('number', 'Rank');
+                dt.addColumn('string', 'Biological process');
+		dt.addColumn('string', 'Count of associations');
+                dt.addRows(rows);
+                for (var i=0;i<rows;i++) {
+                        var caps = capitalizeFirstLetter(data[i]['mir_fun']);
+			dt.setCell(i, 0, i+1);
+                        dt.setCell(i, 1, caps);
+			dt.setCell(i, 2, data[i]['functionCount']);
+                }
+
+                optionsgdf['page'] = 'enable';
+                optionsgdf['pageSize'] = 10;
+                optionsgdf['pagingSymbols'] = {prev: 'prev', next: 'next'};
+                optionsgdf['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                optionsgdf['cssClassNames'] = cssNames;
+
+		if( document.getElementById('pageCntGeneFuns') != null ) {
+	                document.getElementById('pageCntGeneFuns').innerHTML = rows;
+		}
+
+                var vis = new google.visualization.Table(document.getElementById('geneDiseasesFunctions'));
+                vis.draw(dt, optionsgdf);
+                var rem = rows % 10;
+
+		if( document.getElementById('pageCntGeneFuns') != null ) {
+	                if(rows >= 10) {
+        	                document.getElementById('pageNumberingGeneFuns').innerHTML = 10;
+                	}
+	                else {
+        	                document.getElementById('pageNumberingGeneFuns').innerHTML = rem;
+                	}
+		}
+
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+                        if( counnt >= 10 ) {
+                                document.getElementById('pageNumberingGeneFuns').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                        }
+                        else {
+                                document.getElementById('pageNumberingGeneFuns').innerHTML = (e.page * 10) + rem;
+                        }
+                });
+        }
+
+        function drawGeneDisease(data) {
+                var dt = new google.visualization.DataTable();
+                var rows = data.length;
+		dt.addColumn('number', 'Rank');
+                dt.addColumn('string', 'Top affected diseases');
+                dt.addColumn('string', 'Count of associations');
+                dt.addRows(rows);
+                for (var i=0;i<rows;i++) {
+                        var caps = capitalizeFirstLetter(data[i]['dis_name']);
+			dt.setCell(i, 0, i+1);
+                        dt.setCell(i, 1, caps);
+			dt.setCell(i, 2, data[i]['diseaseCount']);
+                }
+
+                optionsgd['page'] = 'enable';
+                optionsgd['pageSize'] = 10;
+                optionsgd['pagingSymbols'] = {prev: 'prev', next: 'next'};
+                optionsgd['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                optionsgd['cssClassNames'] = cssNames;
+
+		if ( document.getElementById('pageCntGene') != null) {
+			document.getElementById('pageCntGene').innerHTML = rows;
+		}
+                var vis = new google.visualization.Table(document.getElementById('geneDiseases'));
+                vis.draw(dt, optionsgd);
+                var rem = rows % 10;
+
+		if( document.getElementById('pageNumberingGene') != null ) {
+                if(rows >= 10) {
+                        document.getElementById('pageNumberingGene').innerHTML = 10;
+                }
+                else {
+                        document.getElementById('pageNumberingGene').innerHTML = rem;
+                }
+		}
+
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+			if( document.getElementById('pageNumberingGene') != null ) {
+	                        if( counnt >= 10 ) {
+        	                        document.getElementById('pageNumberingGene').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                	        }
+                        	else {
+	                                document.getElementById('pageNumberingGene').innerHTML = (e.page * 10) + rem;
+        	                }
+			}
+                });
+        }
+
+	function drawDiseaseList(data) {
+		var dt = new google.visualization.DataTable();
+		var rows = data.length;
+		dt.addColumn('number', 'Rank');
+		dt.addColumn('string', 'miRNA');
+		dt.addColumn('string', 'Chemical');
+		dt.addColumn('string', 'Count of associations');
+		dt.addRows(rows);
+		for (var i=0;i<rows;i++) {
+			var capsTwo = capitalizeFirstLetter(data[i]['chem_name']);
+			dt.setCell(i, 0, i+1);
+			dt.setCell(i, 1, data[i]['mirna_name']);
+			dt.setCell(i, 2, capsTwo);
+			dt.setCell(i, 3, data[i]['mirnaCount']);
+		}
+
+		optionsPair['page'] = 'enable';
+		optionsPair['pageSize'] = 10;
+		optionsPair['pagingSymbols'] = {prev: 'prev', next: 'next'};
+		optionsPair['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                optionsPair['cssClassNames'] = cssNames;
+
+		if(document.getElementById('pageCntDis') != null) {
+			document.getElementById('pageCntDis').innerHTML = rows;
+		}
+
+		var vis = new google.visualization.Table(document.getElementById('diseaseCMPair'));
+		vis.draw(dt, optionsPair);
+
+                var rem = rows % 10;
+
+		if(document.getElementById('pageCntDis') != null) {
+	                if(rows >= 10) {
+        	                document.getElementById('pageNumberingDis').innerHTML = 10;
+                	}
+	                else {
+        	                document.getElementById('pageNumberingDis').innerHTML = rem;
+                	}
+		}
+
+                google.visualization.events.addListener(vis, 'page', function (e) {
+                        var counnt = rows - ( e.page*10 ) ;
+                        if( counnt >= 10 ) {
+                                document.getElementById('pageNumberingDis').innerHTML = (e.page * 10) + 10; //e.page + 1;
+                        }
+                        else {
+                                document.getElementById('pageNumberingDis').innerHTML = (e.page * 10) + rem;
+                        }
+                });
+	}
+
+	</script>
+  <script> //<!-- id="source" language="javascript" type="text/javascript"-->
+  $(function () {
+	$(".hidepubmeds").click(function() {
+		$("#pubmedsdiv, .hidepubmeds").css("visibility", "hidden");
+	});
+	$("#hidepubmedsdiv").css( { left: $("#pubmedsdiv").position().left + $("#pubmedsdiv").width()+135, top: $("#pubmedsdiv").height()-90, position: 'absolute' } );
+                $.ajax({ // Get list of Chemicals
+                        type: "POST",
+                        url: "loadSuggestions.php",
+                        data: {'fetchChemicals': 22},
+                        dataType: "json",
+                        success: function(allChemicals) {
+                                $("#chemicals").append('<option value="" selected="selected">' +"Select Chemical" + '</option>');
+                                for(j=0;j<allChemicals.length;j++) {
+                                        var capitalChemicalName = capitalizeFirstLetter(allChemicals[j]['chem_name']);
+                                        $("#chemicals").append('<option value="' +allChemicals[j]['chem_name'] + '">'+capitalChemicalName+ '</option>');
+                                }
+                        }
+                });
+
+        $("#chemicals").change(function() { // on Dropdown change
+                var chemicalName = $("#chemicals option:selected").val();
+                if(chemicalName) {
+                        $.ajax({
+                                type: "POST",
+                                url: "loadSuggestions.php",
+                                data: {'chemicalType': chemicalName, 'idata': 26},
+                                success: function(chemicalResults) {
+                                        var sigh = JSON.parse(chemicalResults);
+					$.ajax({
+						type: "POST",
+						url: "loadSuggestions.php",
+						data: {'chemicalType': chemicalName, 'idata': 27},
+						success: function(funData) {
+							var functionData = JSON.parse(funData);
+							drawVisualization(sigh);
+							$("#numberingDiv").show();
+							drawVisualizationFunctions(functionData);
+							$("#numberingDivFuns").show();
+						}
+					});
+                                }
+                        });
+                }
+	});
+
+	$("#diseaseFormOne").submit(function(event) {
+                event.preventDefault();
+		var mirnaList = $("#mirnaBox").val();
+		if(mirnaList) {
+			$.ajax({
+				type: "POST",
+				url: "diseaseAnalysis.php",
+				data: {'fromDiseaseAnalysis': mirnaList, 'sub': 15},
+				dataType: "JSON",
+				success: function(data) {
+					//alert(data);
+					var datas = JSON.parse(data);
+					if(datas) {
+	                                        drawMirnaDisease(datas, mirnaList);
+        	                                $("#numberingDivmiRNA").show();
+					}
+					else {
+						alert("Disease data releated to miRNAs entered does not exist.");
+					}
+	        	                $.ajax({
+        	        	                type: "POST",
+                                		url: "diseaseAnalysis.php",
+		                                data: {'fromDiseaseAnalysisTen': mirnaList, 'sub': 10},
+                		                dataType: "JSON",
+                               			success: function(dataNew) {
+                       	                		var datasNew = JSON.parse(dataNew);
+							if(datasNew) {
+								drawMirnaDiseaseFuns(datasNew);
+								$("#numberingDivmiRNAFuns").show();
+							}
+							else {
+								alert("Functional data related to miRNAs entered does not exist.");
+							}
+        	                        }
+	                        });
+				}
+			});
+		}
+	});
+	$("#diseaseFormTwo").submit(function(event) {
+		event.preventDefault();
+		var geneList = $("#geneBox").val();
+		if(geneList) {
+                        $.ajax({
+                                type: "POST",
+                                url: "diseaseAnalysis.php",
+                                data: {'fromGeneAnalysis': geneList, 'sub': 15},
+                                dataType: "JSON",
+                                success: function(data) {
+					//alert(data);
+                                        var datas = JSON.parse(data);
+					if(datas) {
+						drawGeneDisease(datas);
+						$("#numberingDivGene").show();
+					}
+					else {
+						alert("Disease data related to Genes entered does not exist.");
+					}
+					$.ajax({
+						type: "POST",
+						url: "diseaseAnalysis.php",
+						data: {'fromGeneAnalysisTen': geneList, 'sub': 10},
+						dataType: "JSON",
+						success: function(dataNew) {
+							var datasNew = JSON.parse(dataNew);
+							if(datasNew) {
+								drawGeneDiseaseFuns(datasNew);
+								$("#numberingDivGeneFuns").show();
+							}
+							else {
+								alert("Functional data related to Genes entered does not exist.");
+							}
+						},
+		                                error: function (xhdr, textStatus, errors) {
+                		                        alert("Error retrieving Biological process data");
+						}
+					});
+                                },
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert("Error retrieving Disease data");
+				}
+                        });
+		}
+        });
+        $("#diseaseFormThree").submit(function(event) {
+                event.preventDefault();
+                var diseaseList = $("#diseaseBox").val();
+		if(diseaseList) {
+			$.ajax({
+				type: "POST",
+				url: "diseaseAnalysis.php",
+				data: {'fromDiseaseListAnalysis': diseaseList},
+				dataType: "JSON",
+				success: function(data) {
+					var parsed = JSON.parse(data);
+					if(parsed) {
+						drawDiseaseList(parsed);
+						$("#numberingDivDis").show();
+					}
+					else {
+						alert("Chemical and miRNA data related to diseases entered does not exist.");
+					}
+				}
+			});
+		}
+	});
+
+	$(".ui-tabs").tabs({
+		select: function(event, ui) {
+			if(ui.index == 1) {
+				$("#numberingTabs1").show();
+			}
+			if(ui.index == 2) {
+				$("#pubmedsdiv, .hidepubmeds").css("visibility", "hidden");
+				$("#numberingTabs2").show();
+			}
+			if(ui.index == 3) {
+				$("#pubmedsdiv, .hidepubmeds").css("visibility", "hidden");
+				$("#numberingTabs3").show();
+			}
+		}
+	});
+
+	$(".testTipOne").click(function(){
+		$(".tipOne").toggle( function() {
+		$(".testTipOne").text( 
+				$(this).is(':visible')? "Hide tip":  "Show tip");
+		});
+	});
+
+        $(".testTipTwo").click(function(){
+                $(".tipTwo").toggle( function() {
+                $(".testTipTwo").text( 
+                                $(this).is(':visible')? "Hide tip":  "Show tip");
+                });
+        });
+
+        $(".testTipThree").click(function(){
+                $(".tipThree").toggle( function() {
+                $(".testTipThree").text( 
+                                $(this).is(':visible')? "Hide tip":  "Show tip");
+                });
+        });
+
+	$(".reset-1").click(function(){
+		$("#mirnaDiseases").html(" "); //hide();
+		$("#mirnaDiseasesFunctions").html(" "); //hide();
+		$("#numberingDivmiRNA").html(" "); //hide();
+		$("#numberingDivmiRNAFuns").html(" "); //hide();
+		$("#pageNumberingmiRNA").html(" ");
+		$("#pageNumberingmiRNAFuns").html(" ");
+	});
+
+	$(".reset-2").click(function() {
+		$("#geneDiseases").html(" "); //empty(); //hide();
+		$("#geneDiseasesFunctions").html(" "); //empty(); //hide();
+                $("#pageCntGene").html(" "); //empty();
+                $("#pageNumberingGene").html(" "); //empty();
+                $("#pageNumberingGeneFuns").html(" "); //empty();
+		$("#numberingDivGene").html(" "); //empty(); //hide();
+		$("#numberingDivGeneFuns").html(" "); //empty(); //hide();
+	});
+
+	$(".reset-3").click(function() {
+		$("#diseaseCMPair").html(" "); //hide();
+		$("#numberingDivDis").html(" "); //hide();
+		$("#pageNumberingDis").html(" ");
+	});
+
+
+	});
+	</script>
+</head>
+  <body>
+                <div id="wrapper">
+                        <div id="header" class="headerDiv">
+                                <div id="titleImage"> <h3><a href="index.php" class="titleClass">miRegulome</a> <br/>
+<a href="javascript:void(0)" style="text-decoration: none; font-size: 0.9em; color: rgba(255, 255, 255, 0.5); font-family: Arial, Helvetica, sans-serif ; ">a knowledge base of miRNA regulomics</a></h3>
+                                </div>
+                        </div>
+                                                <ul class="ktb">
+                                                        <li><a href="index.php" class="navAnchor">Home</a></li>
+                                                        <li><a href="dbLookup.php" class="navAnchor">Search by Chemical</a></li>
+                                                        <li><a href="advsearch.html" class="navAnchor">Advanced Search</a></li>
+                                                        <li><a href="analysis.html" class="branding navAnchor">Analysis</a></li>
+                                                        <li><a href="javascript:void(0);" class="navAnchor navAnchor-more">More<i class="icon-chevron-down"></i></a>
+                                                                <ul class="flowingNav">
+                                                                        <li><a href="faqs.html" class="navAnchor">FAQs</a></li>
+                                                                        <!--li><a href="copyrights.html" class="navAnchor">Copyrights</a></li-->
+                                                                        <li><a href="contact.html" class="navAnchor">Team</a></li>
+									<li><a href="disclaimer.html" class="navAnchor">Disclaimer</a></li>
+									<li><a href="userguide.html" class="navAnchor">User Guide</a></li>
+									<li><a href="resources.html" class="navAnchor">Resources</a></li>
+                                                                </ul>
+                                                        </li>
+                                                </ul>
+                        <div id="headerBar"> </div>
+                        <div id="mainContent">
+                                <div id="rightContent">
+                                        <div id="content">
+                                                <div id="contentHeading"> Disease analysis </div>
+                                                <div class="message">
+                                                        <div id="messageHeading">Instructions
+							</div>
+                                                        <div id="messageMessage">
+                                                                <ol>
+									<li>Chemicals affecting diseases can be explored</li>
+									<li>miRNA-disease relationships can be explored</li>
+									<li>Gene-disease relationships can be explored</li>
+									<li>Disease-Chemical/miRNA pair relationships can be explored</li>
+                                                                </ol>
+                                                        </div>
+                                                </div>
+						<div id="pubmedsdiv">
+							<div id="hidepubmedsdiv"><a href="javascript:void(0);" class="hidepubmeds">Hide</a></div>
+							<div id="selectedDisease"></div>
+							<div id="dialogPubmed"></div>
+							<span id="searchurls"></span>
+						</div>
+                                                <div class="ui-tabs">
+	                                                <ul class="ui-tabs-nav">
+                                                        	<li><a href="#tabs-1">Chemical-Disease</a></li>
+                                                                <li><a href="#tabs-2">miRNA-Disease</a></li>
+                                                                <li><a href="#tabs-3">Gene-Disease</a></li>
+                                                                <li><a href="#tabs-4">Disease-Chemical/miRNA</a></li>
+                                                                <li id="displaySelectedMirnaName"></li>
+                                                        </ul>
+								<div id="tabs-1" class="ui-tabs-panel">
+			                                                <table>
+										<tr><td><select name="chemicals" class="selectChemical" id="chemicals"> </select></td></tr>
+                        			                                <tr><td><div id="table"> </div></td><td><div id="tableFunctions"> </div> </td></tr>
+		                	                                	<tr><td><div id="numberingDiv" style="display: none; font-size: 12px;">
+        			                                                Displaying <span id="pageNumbering"></span> out of <span id="pageCnt"></span>
+	                        		                        </div> </td>
+										<td>
+											<div id="numberingDivFuns" style="display: none; font-size: 12px;">
+	                	                                                                Displaying <span id="pageNumberingFuns"></span> out of <span id="pageCntFuns"></span>
+         		                                                               </div>
+										</td></tr>
+									</table>
+								</div>
+	                                                        <div id="tabs-2" class="ui-tabs-panel">
+                                                                        <div id="numberingTabs1" style="display: none;">
+										<form action="" class="input-holder" id="diseaseFormOne">
+										<table>
+											<tr><th>miRNA-Disease relationship</th> <th><i><a class="testTipOne embeddedAnchors" href="javascript:void(0);">Show tip</a></i> </th>  </tr>
+											<tr><td><textarea id="mirnaBox" rows = "15" cols="80"></textarea></td>
+											<td><textarea style="display: none" class="tipOne" disabled="disabled" rows="12" cols="45">Enter miRNAs (if more than one) as&#13;[comma separated] or [newline separated]
+												mir-21, mir-29a &#10;&#10;OR&#10;&#10;mir-21&#13;mir-29a&#10;click 'Submit'
+											     </textarea></td></tr>
+											<tr><td><div id="mirnaDiseases"></div></td><td><div id="mirnaDiseasesFunctions"></div></td></tr>
+											<tr>
+												<td>
+				                                                                        <div id="numberingDivmiRNA" style="display: none; font-size: 12px;">
+                                			                                                Displaying <span id="pageNumberingmiRNA"></span> out of <span id="pageCntmiRNA"></span>
+                                                        				                </div>
+												</td>
+												<td>
+													<div id="numberingDivmiRNAFuns" style="display: none; font-size: 12px;">
+                                                                                                        Displaying <span id="pageNumberingmiRNAFuns"></span> out of <span id="pageCntmiRNAFuns"></span>
+                                                                                                        </div>
+												</td>
+											</tr>
+											<tr><td><input type="submit" value="Submit"> <input type="reset" value="Clear" class="reset-1"> </td></tr>
+										</table>
+										</form>
+                                                                        </div>
+                                                                </div>
+
+                                                                <div id="tabs-3" class="ui-tabs-panel">
+                                                                        <div id="numberingTabs2" style="display: none;">
+                                                                                <form action="" class="input-holder" id="diseaseFormTwo">
+                                                                                <table>
+                                                                                        <tr><th>Gene-Disease relationship</th><th><i><a class="testTipTwo embeddedAnchors" href="javascript:void(0);">Show tip</a></i></th>  </tr>
+                                                                                        <tr><td><textarea id="geneBox" rows = "15" cols="80"></textarea></td>
+                                                                                        <td><textarea style="display:none;" disabled="disabled" class="tipTwo" rows="12" cols="45">Enter Genes (if more than one) as&#13;[comma separated] or [newline separated]
+                                                                                                NOTCH1, WDR20 &#10;&#10;OR&#10;&#10;NOTCH1 &#10;WDR20&#10;click 'Submit'
+                                                                                             </textarea></td></tr>
+                                                                                        <tr><td><div id="geneDiseases"></div></td><td><div id="geneDiseasesFunctions"></div></td></tr>
+                                                                                        <tr>
+                                                                                                <td>
+                                                                                                        <div id="numberingDivGene" style="display: none; font-size: 12px;">
+                                                                                                        Displaying <span id="pageNumberingGene"></span> out of <span id="pageCntGene"></span>
+                                                                                                        </div>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                        <div id="numberingDivGeneFuns" style="display: none; font-size: 12px;">
+                                                                                                        Displaying <span id="pageNumberingGeneFuns"></span> out of <span id="pageCntGeneFuns"></span>
+                                                                                                        </div>
+                                                                                                </td>
+                                                                                        </tr>
+
+                                                                                        <tr><td><input type="submit" value="Submit"> <input type="reset" value="Clear" class="reset-2"></td></tr>
+                                                                                </table>
+                                                                                </form>
+                                                                        </div>
+                                                                </div>
+                                                                <div id="tabs-4" class="ui-tabs-panel">
+                                                                        <div id="numberingTabs3" style="display: none;">
+                                                                                <form action="" class="input-holder" id="diseaseFormThree">
+                                                                                <table>
+                                                                                        <tr><th>Disease-Chemical/miRNA pair relationship</th> <th><i><a class="testTipThree embeddedAnchors" href="javascript:void(0);">Show tip</a></i></th></tr>
+                                                                                        <tr><td><textarea id="diseaseBox" rows = "15" cols="80"></textarea></td>
+                                                                                        <td><textarea style="display:none;" class="tipThree" disabled="disabled" rows="12" cols="45">Enter Diseases (if more than one) as&#13;[comma separated] or [newline separated]
+                                                                                                cancer, breast cancer &#10;&#10;OR&#10;&#10;cancer &#10;breast cancer&#10;&#10;click 'Submit'
+                                                                                             </textarea></td></tr>
+                                                                                        <tr><td><div id="diseaseCMPair"></div></td></tr>
+                                                                                        <tr>
+                                                                                                <td>
+                                                                                                        <div id="numberingDivDis" style="display: none; font-size: 12px;">
+                                                                                                        Displaying <span id="pageNumberingDis"></span> out of <span id="pageCntDis"></span>
+                                                                                                        </div>
+                                                                                                </td>
+											</tr>
+                                                                                        <tr><td><input type="submit" value="Submit"> <input type="reset" value="Clear" class="reset-3"> </td></tr>
+                                                                                </table>
+                                                                                </form>
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+
+                                        </div> <!--end of content-->
+                                </div> <!--end of rightContent-->
+                        </div> <!--end of mainContent-->
+                </div> <!--end of wrapper-->
+		<p class="copyrights-footer">
+             Copyrights: All rights are reserved by <a href="http://iioab.ac.in/" target="_blank" class="embeddedAnchors">Institute of Integrative Omics and Applied Biotechnology (IIOAB)</a> and <a href="http://bnet.egr.vcu.edu/" target="_blank" class="embeddedAnchors" >Biological Networks Lab, VCU</a>
+        </p>
+
+</body>
+</html>
+         

@@ -1,0 +1,29 @@
+#wrapper {height: 1000px; margin: 0; width: 100%; clear: both;}
+#content {height: 800px; margin: 0 auto; width: 800px; clear: both; }
+#header {height: 75px; width: 800px; font: 28px;}
+#left {height: 725px; width: 150px;float: left;}
+#right {height: 725px; width: 650px;float: left;}
+.websiteHeading { font-size: 30px; text-decoration: none; font-family: 'Libre Baskerville', serif; color: black; }
+#navMenu ul { margin: 0px; padding: 0px; }
+#navMenu li { list-style: none; }
+#navMenu ul li a { font-family: 'Libre Baskerville', serif; text-decoration:none; height:30px; display: block; color: black; }  /*border: 1px solid transparent; } */
+
+#rightcontent {}
+#description {}
+#footer {}
+
+#table { width: 700px; } /* height: 600px; } */
+body { font-family: 'Libre Baskerville', serif; font-size: 14px; }
+h3 {font-size: 15px;}
+
+.hidden {
+	display: none;
+}
+
+#navMenu { width: 150px; margin: 10; }
+#download { top: 80%; height: auto; position: absolute; }
+
+/*#search_box { padding:4px; border:solid 1px #666666; width:100px; height:30px; font-size:18px;-moz-border-radius: 3px;-webkit-border-radius: 3px; }
+.search_button { border:#000000 solid 1px; padding: 6px; color:#000; font-weight:bold; font-size:12px;-moz-border-radius: 3px;-webkit-border-radius: 3px; }*/
+
+

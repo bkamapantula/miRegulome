@@ -1,0 +1,408 @@
+<html>
+  <head>
+	<title>miR-DAT | Browse database</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+        <!--link href="design.css" rel="stylesheet" type="text/css"/-->
+        <link rel="stylesheet" type="text/css" media="screen and (max-width: 1920px)" href="design.css">
+        <link rel="stylesheet" type="text/css" media="screen and (min-width: 701px) and (max-width: 1366px)" href="laptopDesign.css">
+	<link href="tabs.css" rel="stylesheet" type="text/css"/>
+        <!--link href='http://fonts.googleapis.com/css?family=EB+Garamond' rel='stylesheet' type='text/css'/-->
+	<script type="text/javascript" src="js/vis.js"></script>
+        <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+                google.load("jquery", "1.6.1");
+                google.load('visualization', '1', {packages: ['table']});
+        </script>
+         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="http://jquery.com/latest/ui/jquery.ui.tabs.js"></script>
+       <!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script-->
+        <script type="text/javascript">
+        // http://www.codeforest.net/simple-search-with-php-jquery-and-mysql
+        var options = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsOne = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsTwo = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsThree = {allowHtml: true, alternatingRowStyle: true};
+	var optionsFour = {allowHtml: true, alternatingRowStyle: true}; 
+	var optionsFive = {allowHtml: true, alternatingRowStyle: true};
+	var optionsSix = {allowHtml: true, alternatingRowStyle: true};
+	var selectedMirna = '';
+	var currentTab = -1; var capitalChemicalNameMain = '';
+
+        function capitalizeFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        function capitalizeFirstLetterAllWords(string) {
+                return string.replace(/\w\S+/g, function(txt){return txt.charAt(0).toUpperCase()+txt.substr(1).toLowerCase();});
+        }
+
+        function drawVisualization(data) {
+                var dataTable = new google.visualization.DataTable();
+                var numRows = data.length; var numCols = 7;
+                dataTable.addColumn('string', 'Chemical Name'); dataTable.addColumn('string', 'miRNA'); dataTable.addColumn('string', 'Regulation'); dataTable.addColumn('string', 'Condition');
+                dataTable.addColumn('string', 'Technique'); dataTable.addColumn('string', 'PMID'); dataTable.addColumn('string', 'miRNA Details'); 
+                dataTable.addRows(numRows);
+                for (var j = 0; j < numRows; j++) {
+			capitalChemicalNameMain = capitalizeFirstLetter(data[j]['chem_name']);
+                        dataTable.setCell(j, 0, '<a href="'+data[j]['ctd_link']+'" class="embeddedAnchors" target="_blank">' + capitalChemicalNameMain + '</a>');
+                        mirnaurl = 'http://www.mirbase.org/cgi-bin/query.pl?terms='+ data[j]['mirna_name'] +'&submit=Search';
+                        dataTable.setCell(j, 1, '<a href="'+mirnaurl+'" class="embeddedAnchors" target="_blank">' + data[j]['mirna_name'] + '</a>');
+			var capitalRegulation = capitalizeFirstLetter(data[j]['response']);
+			var capitalCondition = capitalizeFirstLetter(data[j]['cond']);
+			var capitalTechnique = capitalizeFirstLetter(data[j]['tech']);
+                        dataTable.setCell(j, 2, capitalRegulation); dataTable.setCell(j, 3, capitalCondition); dataTable.setCell(j, 4, capitalTechnique);
+			if(data[j]['chem_pubId'] != null) {
+	                        pubmedurl = 'http://www.ncbi.nlm.nih.gov/pubmed?term=' + data[j]['chem_pubId'];
+	                        dataTable.setCell(j, 5, '<a href="'+pubmedurl+'" class="embeddedAnchors" target="_blank">' +data[j]['chem_pubId'] + '</a>');
+			}
+			else {
+				dataTable.setCell(j, 5, "N/A");
+			}
+                        dataTable.setCell(j, 6, data[j]['mirna_name'] );
+                }
+
+                options['page'] = 'enable'; options['pageSize'] = 10;
+		options['pagingSymbols'] = {prev: 'prev', next: 'next'};
+		var total = Math.ceil(numRows/10);
+		document.getElementById('pageCnt').innerHTML = total;
+
+		options['pagingButtonsConfiguration'] = 'auto';
+                var cssNames = {oddTableRow: 'testOddRow', tableRow: 'tableRow', hoverTableRow: 'hoveringTableRow', selectedTableRow: 'tableRowSelected'};
+                options['cssClassNames'] = cssNames;
+
+                visualization = new google.visualization.Table(document.getElementById('table')); visualization.draw(dataTable, options);
+			google.visualization.events.addListener(visualization, 'page', function (e) {
+				document.getElementById('pageNumbering').innerHTML = e.page + 1;
+			});
+		google.visualization.events.addListener(visualization, 'select', selectHandler);
+		var counter = 1;
+
+		function selectHandler() {
+			var selection = visualization.getSelection();
+			var message = '';
+			for (var i = 0; i < selection.length; i++) {
+				var item = selection[i];
+				if (item.row != null && item.column != null) {
+					var str = dataTable.getFormattedValue(item.row, item.column);
+					message += '{row:' + item.row[1] + '}' + +str+'\n' ; //+ ',column:' + item.column + '} = ' + str + '\n';
+				} else if (item.row != null) {
+					var str = dataTable.getFormattedValue(item.row, 6);
+					selectedMirna = str;
+					message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
+                                        if(counter === 0) {
+                                                $("displaySelectedMirnaName").empty();
+                                                $("#displaySelectedMirnaName").append('<a href="#">'+'Selected: '+selectedMirna+'</a>');
+                                                counter = 1;
+                                        }
+                                        if(counter === 1) {
+                                                $("#displaySelectedMirnaName").empty();
+	                                        $("#displaySelectedMirnaName").append('<a style="background-color:#061413; color: #ffffff;">'+capitalChemicalNameMain+' -> '+selectedMirna+'</a>');
+                                                counter = 0;
+                                        }
+					$.ajax({
+						type: "POST",
+						url: "loadSuggestions.php", 
+						data: {'mirnaSelectedForDisplay': str, 'idata': 90},
+						success: function(upStream) {
+							var upstreamResults = JSON.parse(upStream);
+							$(".ui-tabs").show();
+							drawUpstream(upstreamResults); 
+							$("#numberingTabs1").show();
+						}
+					});
+					if(currentTab !== -1) {
+						if(currentTab === 1) { // Current selected tab is Validated Targets
+			                                $.ajax({
+                        			                type: "POST",
+			                                        url: "loadSuggestions.php",
+                        			                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 95},
+			                                        success: function(validatedTargetsResultsAreBack) {
+                        			                        var onlyVt = JSON.parse(validatedTargetsResultsAreBack);
+                                                			drawValidatedTargets(onlyVt);
+									$("#numberingTabs2").show();
+                        			                }
+			                                });
+						}
+						if(currentTab === 2) { // Current selected tab is Top Targets
+                                                        $.ajax({
+                                                                type: "POST",
+								url: "loadSuggestions.php",
+						                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 100},
+                                                                success: function(topTargetsResultsAreBack) {
+                                                                        var onlyTt = JSON.parse(topTargetsResultsAreBack);
+                                                                        drawTopTargets(onlyTt);
+									$("#numberingTabs3").show();
+                                                                }
+                                                        });
+						}
+                                                if(currentTab === 3) { // Current selected tab is Function of miRNA
+                                                        $.ajax({
+                                                                type: "POST",
+								url: "loadSuggestions.php",
+						                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 105},
+                                                                success: function(davidResultsAreBack) {
+                                                                        var onlyDavid = JSON.parse(davidResultsAreBack);
+                                                                        drawDavid(onlyDavid);
+									$("#numberingTabs4").show();
+                                                                }
+                                                        });
+                                                }
+                                                if(currentTab === 4) { // Current selected tab is Disease Involvement
+                                                        $.ajax({
+                                                                type: "POST",
+                                                                url: "loadSuggestions.php",
+                                                                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 110},
+                                                                success: function(diseaseResultsAreBack) {
+                                                                        var onlyDisease = JSON.parse(diseaseResultsAreBack);
+                                                                        drawDisease(onlyDisease);
+									$("#numberingTabs5").show();
+                                                                }
+                                                        });
+                                                }
+                                                if(currentTab === 5) { // Current selected tab is Pathway
+                                                        $.ajax({
+                                                                type: "POST",
+                                                                url: "loadSuggestions.php",
+                                                                data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 115},
+                                                                success: function(pathwayResultsAreBack) {
+                                                                        var onlyPathway = JSON.parse(pathwayResultsAreBack);
+                                                                        drawPathways(onlyPathway);
+									$("#numberingTabs6").show();
+                                                                }
+                                                        });
+                                                }
+					}
+				} else if (item.column != null) {
+					var str = dataTable.getFormattedValue(0, item.column);
+					message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
+					}
+			} // for loop end
+			if (message == '') {
+				message = 'nothing';
+			}
+		} // end of select event handler
+        }
+
+	</script>
+  <script> //<!-- id="source" language="javascript" type="text/javascript"-->
+  $(function () {
+	//$(".ui-tabs").tabs();
+	$.ajax({ // Get list of Chemicals
+		type: "POST",
+		url: "loadSuggestions.php",
+		data: {'fetchChemicals': 22},
+		dataType: "json",
+		success: function(allChemicals) {
+			$("#chemicals").append('<option value="" selected="selected">' +"Select Chemical" + '</option>');
+			//alert(allChemicals[2]['chem_name']);
+			for(j=0;j<allChemicals.length;j++) {
+				var capitalChemicalName = capitalizeFirstLetter(allChemicals[j]['chem_name']);
+				$("#chemicals").append('<option value="' +allChemicals[j]['chem_name'] + '">'+capitalChemicalName+ '</option>');
+			}
+		}
+	});
+
+	$(".ui-tabs").tabs({ 
+		select: function(event, ui) {
+			currentTab = ui.index;
+			if(ui.index === 0) { // Upstream
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+					data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 90},
+					success: function(upstreamResultsAreBack) {
+						var onlyUpstream = JSON.parse(upstreamResultsAreBack);
+						drawUpstream(onlyUpstream);
+						$("#numberingTabs1").show();
+					}
+				});
+			}
+			if(ui.index === 1) { // Validated Targets
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+					data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 95},
+					success: function(validatedTargetsResultsAreBack) {
+						var onlyVt = JSON.parse(validatedTargetsResultsAreBack);
+						drawValidatedTargets(onlyVt);
+						$("#numberingTabs2").show();
+					}
+				});
+			}
+			if(ui.index === 2) { // Top Targets
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+                                        data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 100},
+					success: function(topTargetsResultsAreBack) {
+						var onlyTt = JSON.parse(topTargetsResultsAreBack);
+						drawTopTargets(onlyTt);
+						$("#numberingTabs3").show();
+					}
+				});
+			}
+			if(ui.index === 3) { // Function of miR - David
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+					data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 105},
+					success: function(davidResultsAreBack) {
+						var onlyD = JSON.parse(davidResultsAreBack);
+						drawDavid(onlyD);
+						$("#numberingTabs4").show();
+					}
+				});
+			}
+			if(ui.index === 4) { // Disease Involvement
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+					data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 110},
+					success: function(diseaseResultsAreBack) {
+						var onlyDisease = JSON.parse(diseaseResultsAreBack);
+						drawDisease(onlyDisease);
+						$("#numberingTabs5").show();
+					}
+				});
+			}
+			if(ui.index === 5) { // Pathways
+				$.ajax({
+					type: "POST",
+					url: "loadSuggestions.php",
+					data: {'mirnaSelectedForDisplay': selectedMirna, 'idata': 115},
+					success: function(pathwayResultsAreBack) {
+						var onlyPathways = JSON.parse(pathwayResultsAreBack);
+						drawPathways(onlyPathways);
+						$("#numberingTabs6").show();
+					}
+				});
+			}
+		}
+	});
+
+	$("#chemicals").change(function() { // on Dropdown change
+		var chemicalName = $("#chemicals option:selected").val();
+		if(chemicalName) {
+			//$(".ui-tabs").show();
+			$.ajax({
+				type: "POST",
+				url: "loadSuggestions.php",
+				data: {'chemicalType': chemicalName, 'idata': 25},
+				success: function(chemicalResults) {
+					var sigh = JSON.parse(chemicalResults);
+					drawVisualization(sigh); //alert(chemicalResults);
+					$("#numberingDiv").show();
+				}
+			});
+		}
+		else{
+			$(".ui-tabs").hide();
+			return false;
+		}
+	});
+  }); 
+</script>
+
+</head>
+  <body>
+                <div id="wrapper">
+                        <!--div id="devudiki"> </div-->
+                        <div id="header" class="headerDiv">
+				<div id="titleImage"> <h3><a href="index.html" class="titleClass">miR-DAT</a> 
+                                        <a href="javascript:void(0)" style="text-decoration: none; font-size: 0.9em; color: rgba(255, 255, 255, 0.5); font-family: Arial, Helvetica, sans-serif ; ">micro-RNA Disease Analysis Tool</a></h3>
+                                </div>
+
+                                <div id="leftNavigation">
+                                        <div id="navMenu">
+                                                <ul>
+                                                        <li><a href="index.html" class="navAnchor">Home</a></li>
+                                                        <li><a href="advsearch.html" class="navAnchor">Advanced Search</a></li>
+                                                        <li><a href="faqs.html" class="navAnchor">FAQs</a></li>
+                                                        <li><a href="copyrights.html" class="navAnchor">Copyrights</a></li>
+                                                        <li><a href="contact.html" class="navAnchor">Team</a></li>
+                                                </ul>
+                                        </div> <!--end of navMenu-->
+                                </div> <!--end of leftNavigation-->
+                        </div> <!--end of header-->
+			<div id="headerBar"> </div>
+                        <div id="mainContent">
+                                <div id="rightContent">
+					<!--div id="contentHeading">Database</div-->
+                                        <div id="content">
+						<div id="contentHeading"> Database </div>
+						<div class="message">
+							<div id="messageHeading">Tips</div>
+							<div id="messageMessage">
+								<ol>
+									<li>Select a chemical below</li>
+									<li>Upon selection, a list of miRNAs is presented along with related information</li>
+									<li>Click the miRNA name under miRNA Details (last column) to observe information corresponding to that particular miRNA </li>
+								</ol>
+							</div>
+						</div>
+
+                                                <select name="chemicals" class="selectChemical" id="chemicals"> </select> <br/>
+                                                <div id="output"></div> <br/>
+                                                <div id="table"> 
+						</div> 
+						<div id="numberingDiv" style="display: none;">
+							Page <span id="pageNumbering">1</span> of <span id="pageCnt"></span> 
+						</div> <br/>
+							<div class="ui-tabs" style="display: none;">
+								<ul class="ui-tabs-nav">
+									<li><a href="#tabs-1">Upstream Regulators</a></li>
+									<li><a href="#tabs-2">Validated Targets</a></li>
+									<li><a href="#tabs-3">Top Targets</a></li>
+									<li><a href="#tabs-4">Function of miRNA</a></li>
+									<li><a href="#tabs-5">Disease Involvement</a></li>
+									<li><a href="#tabs-6">Pathways</a></li>
+									<li id="displaySelectedMirnaName"></li>
+								</ul>
+								<div id="tabs-1" class="ui-tabs-panel"> 
+									<div id="drawTabs1"> </div>
+									<div id="numberingTabs1" style="display: none;"> 
+										Page <span id="pageNumberingTabs1">1</span> of <span id="pageCntUpstream"></span>
+									</div>
+								</div>
+								<div id="tabs-2" class="ui-tabs-panel">
+									<div id="drawTabs2"></div>
+									<div id="numberingTabs2" style="display: none;"> 
+										Page <span id="pageNumberingTabs2">1</span> of <span id="pageCntValidTargets"></span>
+									</div>
+								</div>
+								<div id="tabs-3" class="ui-tabs-panel">
+									<div id="drawTabs3"> </div>
+									<div id="numberingTabs3" style="display: none;">
+										Page <span id="pageNumberingTabs3">1</span> of <span id="pageCntTopTargets"></span>
+									</div>
+								</div>
+                                	                        <div id="tabs-4" class="ui-tabs-panel">
+									<div id="drawTabs4"></div>
+									<div id="numberingTabs4" style="display: none;">
+										Page <span id="pageNumberingTabs4">1</span> of <span id="pageCntFunction"></span>
+									</div>
+								</div>
+								<div id="tabs-5" class="ui-tabs-panel">
+									<div id="drawTabs5"></div>
+									<div id="numberingTabs5" style="display:none;">
+										Page <span id="pageNumberingTabs5">1</span> of <span id="pageCntDisease"></span>
+									</div>
+								</div>
+                                                	        <div id="tabs-6" class="ui-tabs-panel">
+									<div id="drawTabs6"></div>
+									<div id="numberingTabs6" style="display: none;">
+										Page <span id="pageNumberingTabs6">1</span> of <span id="pageCntPathway"></span>
+									</div>
+								</div>
+							</div>
+
+                                        </div> <!--end of content-->
+                                </div> <!--end of rightContent-->
+                        </div> <!--end of mainContent-->
+                </div> <!--end of wrapper-->
+                <!--div id="footer">
+                        <p>  <a href="http://bnet.egr.vcu.edu" target="_blank">VCU</a> | IIOAB | <a href="http://www.sastra.edu" target="_blank">SASTRA</a> </p>
+                </div-->
+</body>
+</html>

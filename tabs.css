@@ -1,0 +1,129 @@
+.ui-tabs {
+	zoom: 0.9;
+}
+.ui-tabs .ui-tabs-nav {
+	list-style: none;
+	position: relative;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+}
+.ui-tabs .ui-tabs-nav li {
+	position: relative;
+	float: left;
+	margin: 0 3px -2px 0;
+	padding: 0;
+}
+.ui-tabs .ui-tabs-nav li a {
+	display: block;
+	padding: 10px 20px;
+	background: rgba(61, 45, 36, 0.3); /*#f0f0f0;*/
+	/*border: 1px #ccc solid;*/
+	border-bottom-color: #ccc;
+	outline: none;
+	color: black;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+	padding: 10px 20px 12px 20px;
+	background: rgba(61, 45, 36, 0.8); /*#294052;*/
+	border-bottom-style: none;
+	color: #FFFFFF; /*#4D1E00;*/
+	font-weight: bold;
+}
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a,
+.ui-tabs .ui-tabs-nav li.ui-state-disabled a,
+.ui-tabs .ui-tabs-nav li.ui-state-processing a {
+	cursor: default;
+}
+.ui-tabs .ui-tabs-nav li a,
+.ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+	cursor: pointer;
+}
+.ui-tabs .ui-tabs-panel {
+	display: block;
+	clear: both;
+	border: 2px #ccc solid;
+	padding: 10px;
+	/*background: rgba( 100, 100, 100, 0.4); /*#294052;*/
+}
+.ui-tabs .ui-tabs-hide {
+	display: none;
+}
+ul li a {
+	text-decoration: none;
+}
+/*div.ui-dialog .ui-widget .ui-front .ui-draggable .ui-resizable {
+        border: 3px solid #f36c3d;
+        min-height: 500px;
+	max-height: 500px;
+	min-width: 500px;
+	max-width: 500px;
+}
+div.ui-dialog-titlebar .ui-widget-header .ui-corner-all {
+	color: black;
+	background-color: red;
+}
+
+.ui-dialog {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: .2em;
+	outline: 0;
+}
+.ui-dialog .ui-dialog-titlebar {
+	padding: .4em 1em;
+	position: relative;
+}
+.ui-dialog .ui-dialog-title {
+	float: left;
+	margin: .1em 0;
+	white-space: nowrap;
+	width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+	position: absolute;
+	right: .3em;
+	top: 50%;
+	width: 21px;
+	margin: -10px 0 0 0;
+	padding: 1px;
+	height: 20px;
+}
+.ui-dialog .ui-dialog-content {
+	position: relative;
+	border: 0;
+	padding: .5em 1em;
+	background: none;
+	overflow: auto;
+}
+.ui-dialog .ui-dialog-buttonpane {
+	text-align: left;
+	border-width: 1px 0 0 0;
+	background-image: none;
+	margin-top: .5em;
+	padding: .3em 1em .5em .4em;
+}
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+	float: right;
+}
+.ui-dialog .ui-dialog-buttonpane button {
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+}
+.ui-dialog .ui-resizable-se {
+	width: 12px;
+	height: 12px;
+	right: -5px;
+	bottom: -5px;
+	background-position: 16px 16px;
+}
+.ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}
+
+*/
+
+
