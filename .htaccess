@@ -1,0 +1,12 @@
+# Turns off the Last Modified header except for html docs
+<FilesMatch "\.(ico|jpg|jpeg|png|js|css)$">
+<IfModule mod_expires.c>
+ ExpiresActive on
+ ExpiresDefault "access plus 14 days"
+ Header set Cache-Control "public"
+</IfModule>
+</FilesMatch>
+<FilesMatch "\.(html|htm)$">
+Header set Cache-Control "max-age=3600, public"
+</FilesMatch>
+AddType 'text/html; charset=iso-8859-15' html
